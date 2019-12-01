@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "987406483611",
+    "firebase_url": "https://storit-28df0.firebaseio.com",
+    "project_id": "storit-28df0",
+    "storage_bucket": "storit-28df0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987406483611:android:8f1b4eff91140750d4463e",
+        "android_client_info": {
+          "package_name": "com.example.storit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "987406483611-i73ni2qelcbg3ikfc9uskkgpos3ni6vo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.storit",
+            "certificate_hash": "1a1fbb0cf4ad66c8218f35078a4e78339abd1ca5"
+          }
+        },
+        {
+          "client_id": "987406483611-0iugpi9gp6i143nn07158gji534rvdp6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0srxeNex3QzRwYkrcpAIZkJPjTPDhFNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "987406483611-0iugpi9gp6i143nn07158gji534rvdp6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

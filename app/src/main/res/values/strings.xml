@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">StorIT</string>
+    <string name="username">Username</string>
+    <string name="pass">Password</string>
+    <string name="forgotPass">Forgot Password\?</string>
+    <string name="login">Log In</string>
+    <string name="signUpGoogle">Sign Up with Google</string>
+
+    <string name="titleForSignUp">Join the \nCommunity</string>
+</resources>

@@ -3,6 +3,7 @@ package com.example.storit;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -26,12 +27,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Login extends AppCompatActivity {
     //CTRL + O = shortcut to see overload functions
@@ -47,6 +55,10 @@ public class Login extends AppCompatActivity {
     private Button btnLogIn;
     FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseFirestore db;
+    DocumentReference documentReference;
+    String userId;
+    ProgressDialog progressDialog;
 
     //onCreate function
     @Override
@@ -55,7 +67,10 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //set variables
+        progressDialog = new ProgressDialog(this);
+        db = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
+
         noAccountSignUp = (TextView) findViewById(R.id.noAccountSignUp);
         textForgotPass = (TextView) findViewById(R.id.forgotPassword);
         emailText = (EditText) findViewById(R.id.username);
@@ -108,6 +123,8 @@ public class Login extends AppCompatActivity {
         btnLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog.setMessage("Logging in...");
+                progressDialog.show();
                 String email = emailText.getText().toString();
                 String password = passwordText.getText().toString();
 
@@ -122,14 +139,17 @@ public class Login extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(!task.isSuccessful()){
+                                progressDialog.dismiss();
                                 Toast.makeText(Login.this, "Please storit_logo in again", Toast.LENGTH_SHORT);
                             }else{
+                                progressDialog.dismiss();
                                 Intent i = new Intent(Login.this, Menu.class);
                                 startActivity(i);
                             }
                         }
                     });
                 }else{
+                    progressDialog.dismiss();
                     Toast.makeText(Login.this, "Error occured", Toast.LENGTH_SHORT);
                 }
             }
@@ -202,18 +222,29 @@ public class Login extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Store email in database
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                            //updateUI(user);
+                            userId = mFirebaseAuth.getCurrentUser().getUid();
+                            documentReference = db.collection("Users").document(userId);
+                            Map<String, Object> user = new HashMap<>();
+                            user.put("Email", mFirebaseAuth.getCurrentUser().getEmail());
+
+                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "user Created" );
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure" + e.getMessage());
+                                }
+                            });
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            //Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                            //updateUI(null);
                         }
 
-                        // ...
                     }
                 });
     }

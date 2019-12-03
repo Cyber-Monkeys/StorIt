@@ -5,21 +5,36 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Menu extends AppCompatActivity {
 
     //variables
+    private static final String TAG = "AndroidClarified ----";
     Button btnLogOut;
     FirebaseAuth mFirebaseAuth;
     FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleSignInClient mGoogleSignInClient;
+
+    DocumentReference documentReference;
+    String userId;
+    private FirebaseFirestore db;
+    FirebaseUser firebaseUser;
 
     //onCreate function
     @Override
@@ -28,8 +43,16 @@ public class Menu extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         //set variables
-        btnLogOut = (Button) findViewById(R.id.btnLogOut);
         mFirebaseAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        firebaseUser = mFirebaseAuth.getCurrentUser();
+        if(firebaseUser != null){
+            userId = firebaseUser.getUid();
+            documentReference = db.collection("Users").document(userId);
+        }
+
+
+        btnLogOut = (Button) findViewById(R.id.btnLogOut);
 
         GoogleSignInOptions gso = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

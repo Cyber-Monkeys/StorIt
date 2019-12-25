@@ -16,7 +16,8 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".Menu"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".Login"
             android:screenOrientation="portrait">

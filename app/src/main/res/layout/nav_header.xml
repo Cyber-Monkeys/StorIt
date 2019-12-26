@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
+    android:background="@color/colorAccent"
+    android:gravity="bottom"
+    android:padding="16dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:id="@+id/circular_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:onClick="goToProfile"
+        android:src="@mipmap/ic_launcher_round"
+        app:civ_border_color="#ffffff"
+        app:civ_border_width="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:paddingLeft="20dp"
+        android:paddingBottom="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/headerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="Username"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="#020202" />
+
+        <TextView
+            android:id="@+id/headerEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="email@gmail.com"
+            android:textColor="#0C0C0C" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_payment_details"
+            android:icon="@drawable/ic_cloud_black_24dp"
+            android:title="Payment Details" />
+        <item
+            android:id="@+id/nav_plan"
+            android:icon="@drawable/ic_cloud_black_24dp"
+            android:title="Plans" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/ic_cloud_black_24dp"
+            android:title="Help" />
+        <item
+            android:id="@+id/nav_terms_and_condition"
+            android:icon="@drawable/ic_cloud_black_24dp"
+            android:title="Terms &amp; Condition" />
+        <item
+            android:id="@+id/nav_faqs"
+            android:icon="@drawable/ic_cloud_black_24dp"
+            android:title="FAQs" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_cloud_black_24dp"
+            android:title="Logout" />
+    </group>
+
+</menu>

@@ -18,13 +18,14 @@
             android:background="#B9FFBC"
             android:gravity="center" />
 
-        <TextView
-            android:id="@+id/textView2"
+        <EditText
+            android:id="@+id/editText"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="70"
-            android:layout_height="60dp"
-            android:background="#DEFCDE"
-            android:gravity="center" />
+            android:ems="10"
+            android:hint="Server name"
+            android:inputType="textPersonName"/>
 
     </LinearLayout>
 

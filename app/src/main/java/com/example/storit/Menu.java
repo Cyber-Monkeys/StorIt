@@ -163,8 +163,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                AddNewBottomSheetDialog bottomSheetDialog = new AddNewBottomSheetDialog();
                 if (index == CLIENT)
-                    Toast.makeText(getApplicationContext(), "client", Toast.LENGTH_SHORT).show();
+                    bottomSheetDialog.show(getSupportFragmentManager(), "AddNewBottomSheet");
                 else if (index == SERVER)
                     addServerDialog();
             }

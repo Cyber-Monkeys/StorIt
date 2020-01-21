@@ -2,18 +2,27 @@ package com.example.storit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -27,18 +36,27 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Menu extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     //variables
+    private static final int CLIENT = 0;
+    private static final int SERVER = 1;
+    int index;
+
     NavigationView navigationView;
     ActionBarDrawerToggle actionBarDrawerToggle;
     DrawerLayout drawerLayout;
     Toolbar toolbar;
+    TextView headerEmail, headerName;
     BottomNavigationView bottomNavigationMenu;
     FloatingActionButton fab;
     private static final String TAG = "AndroidClarified ----";
@@ -59,6 +77,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
         //set variables
         navigationView = findViewById(R.id.nav_view);
+        View hView = navigationView.getHeaderView(0);
+        headerEmail = (TextView) hView.findViewById(R.id.headerEmail); //initialize headerEmail from navView
+        headerName = (TextView) hView.findViewById(R.id.headerName); //initialize headerName from navView
         drawerLayout = findViewById(R.id.drawer_layout);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -91,6 +112,37 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         };
 
+        //header of nav drawer
+        hView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Menu.this, Profile.class));
+            }
+        });
+
+        //Setting header email and username from database
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()){
+                    String email = documentSnapshot.getString("Email");
+                    String name = documentSnapshot.getString("Name");
+
+                    if (name == null){
+                        headerName.setText("Username");
+                    }else{
+                        headerName.setText(name);
+                    }
+
+                    headerEmail.setText(email);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "FAILURE " + e.getMessage());
+            }
+        });
 
         //bottom navigation view
         bottomNavigationMenu = findViewById(R.id.bottom_navigation);
@@ -111,11 +163,16 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Hello", Toast.LENGTH_SHORT).show();
+                AddNewBottomSheetDialog bottomSheetDialog = new AddNewBottomSheetDialog();
+                if (index == CLIENT)
+                    bottomSheetDialog.show(getSupportFragmentManager(), "AddNewBottomSheet");
+                else if (index == SERVER)
+                    addServerDialog();
             }
         });
 
         //Set fragment to client first
+        index = CLIENT;
         Fragment clientFragment = new ClientFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                 clientFragment, "MY_FRAGMENT_CLIENT").commit();
@@ -141,19 +198,19 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()){
             case R.id.nav_payment_details:
-                Toast.makeText(getApplicationContext(), "payment", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, PaymentDetails.class));
                 break;
             case R.id.nav_plan:
-                Toast.makeText(getApplicationContext(), "plans", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, Plans.class));
                 break;
             case R.id.nav_help:
-                Toast.makeText(getApplicationContext(), "help", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, Help.class));
                 break;
             case R.id.nav_terms_and_condition:
-                Toast.makeText(getApplicationContext(), "terms & comds", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, TermsAndCondition.class));
                 break;
             case R.id.nav_faqs:
-                Toast.makeText(getApplicationContext(), "logout", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, FAQs.class));
                 break;
             case R.id.nav_logout:
                 signOut();
@@ -172,6 +229,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
                     switch(menuItem.getItemId()){
                         case R.id.action_client:
+                            index = CLIENT;
                             getSupportActionBar().setTitle("Client");
                             //show client page
                             if(getSupportFragmentManager().findFragmentByTag("MY_FRAGMENT_CLIENT") != null) {
@@ -187,6 +245,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                             }
                             break;
                         case R.id.action_server:
+                            index = SERVER;
                             getSupportActionBar().setTitle("Server");
                             //show server page
                             if(getSupportFragmentManager().findFragmentByTag("MY_FRAGMENT_SERVER") != null) {
@@ -210,4 +269,64 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                     return true;
                 }
             };
+
+    private void addServerDialog() {
+        //Create alertDialog
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog dialog = builder.create();
+        //Custom title
+        TextView title = new TextView(this);
+        title.setText("Add Server");
+        title.setPadding(10, 10, 10, 10);
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.BLACK);
+        title.setTextSize(20);
+        builder.setCustomTitle(title);
+
+        //Create a custom layout for the dialog box
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.custom_add_server_dialog, null);
+
+        builder.setView(layout);
+
+        //Set seekbar amount of storage
+        SeekBar setSeekbar = (SeekBar)layout.findViewById(R.id.seekBar);
+        final TextView seekBarText = (TextView)layout.findViewById(R.id.textViewSeekBar);
+        setSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progress = progress;
+                seekBarText.setText(progress + " MB");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        Button closeButton = (Button)layout.findViewById(R.id.cancelButton);
+        Button addButton = (Button)layout.findViewById(R.id.addServer);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "HELLO", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //show dialog
+        builder.create().show();
+    }
 }

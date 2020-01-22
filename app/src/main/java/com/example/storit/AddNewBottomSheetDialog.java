@@ -15,10 +15,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.firestore.util.FileUtil;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
@@ -26,6 +29,7 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     //variables
     ImageView addFolder, addSecureUpload, addUpload;
     private static final int REQUEST_CODE = 11;
+    WebRtcClient client;
 
     @Nullable
     @Override
@@ -53,10 +57,23 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 //open document
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                if(client == null)
+                    client = new WebRtcClient("https://www.vrpacman.com", (Menu)(AddNewBottomSheetDialog.this.getActivity()));
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("*/*");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
+//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//
+//                // Provide read access to files and sub-directories in the user-selected
+//                // directory.
+//                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+//                // Optionally, specify a URI for the directory that should be opened in
+//                // the system file picker when it loads.
+//                //intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uriToLoad);
+//
+//                startActivityForResult(intent, REQUEST_CODE);
             }
         });
 
@@ -75,11 +92,12 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.d("STORIT---", "GOT TO ACTIVITY RESULT");
         if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
-
+            Log.d("STORIT---", "pASSED RESULT AND REQUEST CODE");
             //check if data is null
             if(data != null){
+                Log.d("STORIT---", "DATA IS NOT NULLst");
                 Uri uri = data.getData();
 
                 String hi = "";
@@ -87,15 +105,30 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                 Log.d("STORIT---", uri.toString());
                 //using input stream
                 try {
-                    FileInputStream fin = new FileInputStream(uri.toString());
-                    BufferedInputStream bin=new BufferedInputStream(fin);
-                    int i;
-                    while((i=bin.read())!=-1){
-                        charArr[i] = (char)i;
-                    }
+//                    File file = new File(uri.toString());
+//                    int fileSize = (int) file.length();
+//                    FileInputStream fin = new FileInputStream(getActivity().getContentResolver().openFileDescriptor(uri, 'r'));
+                    FileInputStream fin = (FileInputStream) getActivity().getContentResolver().openInputStream(uri);
+                    //int fileSize = fin.getChannel().size();
+                    //InputStream in = getActivity().getContentResolver().openInputStream(uri);
+                    int fileSize = (int) fin.getChannel().size();
+                    Log.d("WebRtcClient", "sending file of size " + fileSize);
+                    //FileInputStream fin = new FileInputStream(uri.toString());
 
-                    bin.close();
+                    //BufferedInputStream bin=new BufferedInputStream(fin);
+                    byte[] bytesArray = new byte[fileSize];
+                    fin.read(bytesArray);
+                    Log.d("WebRtcClient", "sending file of size " + fileSize);
+//                    int i;
+//                    while((i=bin.read())!=-1){
+//                        charArr[i] = (char)i;
+//                    }
+//
+//                    bin.close();
+                    client.sendImage(fileSize, bytesArray, 0);
                     fin.close();
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

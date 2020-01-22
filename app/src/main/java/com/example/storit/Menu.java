@@ -68,6 +68,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     String userId;
     private FirebaseFirestore db;
     FirebaseUser firebaseUser;
+    AlertDialog dialog;
 
     //onCreate function
     @Override
@@ -273,7 +274,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     private void addServerDialog() {
         //Create alertDialog
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final AlertDialog dialog = builder.create();
+
         //Custom title
         TextView title = new TextView(this);
         title.setText("Add Server");
@@ -319,14 +320,22 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "HELLO", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        addButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getApplicationContext(), "HELLO", Toast.LENGTH_SHORT).show();
+//                // start server by connecting to sockets and emitting server event
+//
+//            }
+//        });
 
         //show dialog
-        builder.create().show();
+        dialog = builder.create();
+        dialog.show();
+
+    }
+    public void addServer(View V) {
+        WebRtcClient client = new WebRtcClient("https://www.vrpacman.com/", this);
+        dialog.dismiss();
     }
 }

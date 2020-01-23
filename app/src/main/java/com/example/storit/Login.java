@@ -38,6 +38,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -228,6 +229,10 @@ public class Login extends AppCompatActivity {
                             documentReference = db.collection("Users").document(userId);
                             Map<String, Object> user = new HashMap<>();
                             user.put("Email", mFirebaseAuth.getCurrentUser().getEmail());
+                            user.put("Username", "");
+                            user.put("Name", "");
+                            Date date = new Date(); //set date to null
+                            user.put("Birthdate", date);
 
                             documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

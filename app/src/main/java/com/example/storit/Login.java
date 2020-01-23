@@ -36,6 +36,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
@@ -227,22 +228,40 @@ public class Login extends AppCompatActivity {
                             Log.d(TAG, "signInWithCredential:success");
                             userId = mFirebaseAuth.getCurrentUser().getUid();
                             documentReference = db.collection("Users").document(userId);
-                            Map<String, Object> user = new HashMap<>();
+                            final Map<String, Object> user = new HashMap<>();
                             user.put("Email", mFirebaseAuth.getCurrentUser().getEmail());
                             user.put("Username", "");
                             user.put("Name", "");
                             Date date = new Date(); //set date to null
                             user.put("Birthdate", date);
 
-                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                 @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "user Created" );
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                    if(documentSnapshot.exists()){
+                                        //check if email exists or not
+                                        //if yes, add it
+                                        if (!documentSnapshot.contains("Email")){
+                                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d(TAG, "user Created" );
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG, "onFailure" + e.getMessage());
+                                                }
+                                            });
+                                        }
+
+                                    }
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure" + e.getMessage());
+                                    Log.d(TAG, "FAILURE " + e.getMessage());
                                 }
                             });
                         } else {

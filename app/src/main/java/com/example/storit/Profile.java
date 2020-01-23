@@ -76,7 +76,7 @@ public class Profile extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                startActivity(new Intent(Profile.this, Menu.class));
             }
         });
 

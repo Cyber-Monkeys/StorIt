@@ -12,21 +12,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Profile"
+        <activity android:name=".EditProfile"
+            android:theme="@style/AppTheme.NoActionBar" ></activity>
+        <activity
+            android:name=".Profile"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".PaymentDetails"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PaymentDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".Plans"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Plans"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".Help"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Help"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".TermsAndCondition"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TermsAndCondition"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".FAQs"
             android:screenOrientation="portrait"

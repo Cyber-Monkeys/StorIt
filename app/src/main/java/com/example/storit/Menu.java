@@ -56,7 +56,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     ActionBarDrawerToggle actionBarDrawerToggle;
     DrawerLayout drawerLayout;
     Toolbar toolbar;
-    TextView headerEmail, headerName;
+    TextView headerEmail, headerName, toolbarTitle;
     BottomNavigationView bottomNavigationMenu;
     FloatingActionButton fab;
     private static final String TAG = "AndroidClarified ----";
@@ -177,6 +177,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                 clientFragment, "MY_FRAGMENT_CLIENT").commit();
         getSupportActionBar().setTitle("Client");
+        toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title); //set toolbar title
+        toolbarTitle.setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         navigationView.setCheckedItem(R.id.action_client);
 
     }
@@ -230,7 +233,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                     switch(menuItem.getItemId()){
                         case R.id.action_client:
                             index = CLIENT;
+                            getSupportActionBar().setDisplayShowTitleEnabled(true);
                             getSupportActionBar().setTitle("Client");
+                            toolbarTitle.setText(toolbar.getTitle());
+                            getSupportActionBar().setDisplayShowTitleEnabled(false);
                             //show client page
                             if(getSupportFragmentManager().findFragmentByTag("MY_FRAGMENT_CLIENT") != null) {
                                 //if the fragment exists, show it.
@@ -246,7 +252,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                             break;
                         case R.id.action_server:
                             index = SERVER;
+                            getSupportActionBar().setDisplayShowTitleEnabled(true);
                             getSupportActionBar().setTitle("Server");
+                            toolbarTitle.setText(toolbar.getTitle());
+                            getSupportActionBar().setDisplayShowTitleEnabled(false);
                             //show server page
                             if(getSupportFragmentManager().findFragmentByTag("MY_FRAGMENT_SERVER") != null) {
                                 //if the fragment exists, show it.

@@ -97,8 +97,11 @@ public class EditProfile extends AppCompatActivity {
 
         //Toolbar for this page
         toolbar = findViewById(R.id.toolbar);
+        TextView toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Edit Profile");
+        toolbarTitle.setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         final Drawable goBack = getResources().getDrawable(R.drawable.ic_go_back);

@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="60dp">
+
+    <ImageView
+        android:id="@+id/receivedImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <ListView
         android:id="@android:id/list"
@@ -18,7 +26,9 @@
         android:headerDividersEnabled="true"
         android:footerDividersEnabled="true"
         android:choiceMode="multipleChoice"
-        />
+        >
+
+    </ListView>
 
     <TextView
         android:id="@android:id/empty"

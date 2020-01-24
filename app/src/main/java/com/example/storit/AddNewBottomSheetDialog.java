@@ -2,6 +2,8 @@ package com.example.storit;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,11 +20,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.firestore.util.FileUtil;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
 
@@ -88,7 +92,13 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
             }
         });
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (client != null) {
+            client.onDestroy();
+        }
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -108,25 +118,64 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
 //                    File file = new File(uri.toString());
 //                    int fileSize = (int) file.length();
 //                    FileInputStream fin = new FileInputStream(getActivity().getContentResolver().openFileDescriptor(uri, 'r'));
-                    FileInputStream fin = (FileInputStream) getActivity().getContentResolver().openInputStream(uri);
-                    //int fileSize = fin.getChannel().size();
-                    //InputStream in = getActivity().getContentResolver().openInputStream(uri);
-                    int fileSize = (int) fin.getChannel().size();
-                    Log.d("WebRtcClient", "sending file of size " + fileSize);
-                    //FileInputStream fin = new FileInputStream(uri.toString());
+                     // Let's say this bitmap is 300 x 600 pixels
 
-                    //BufferedInputStream bin=new BufferedInputStream(fin);
-                    byte[] bytesArray = new byte[fileSize];
-                    fin.read(bytesArray);
-                    Log.d("WebRtcClient", "sending file of size " + fileSize);
-//                    int i;
-//                    while((i=bin.read())!=-1){
-//                        charArr[i] = (char)i;
-//                    }
+                    InputStream in = getActivity().getContentResolver().openInputStream(uri);
+                    Bitmap originalBm = BitmapFactory.decodeStream(in);
+//                    Bitmap originalBm = BitmapFactory.decodeFile(uri.toString());
+                    Bitmap bm1 = Bitmap.createBitmap(originalBm, 0, 0, originalBm.getWidth(), (originalBm.getHeight() / 2));
+                    Bitmap bm2 = Bitmap.createBitmap(originalBm, 0, (originalBm.getHeight() / 2), originalBm.getWidth(), (originalBm.getHeight() / 2));
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bm1.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray1 = stream.toByteArray();
+                    bm1.recycle();
+                    ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+                    bm2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
+                    byte[] byteArray2 = stream2.toByteArray();
+                    bm2.recycle();
+                    stream.close();
+                    stream2.close();
+//                    FileInputStream fin = (FileInputStream) getActivity().getContentResolver().openInputStream(uri);
+//                    //int fileSize = fin.getChannel().size();
+//                    //InputStream in = getActivity().getContentResolver().openInputStream(uri);
+//                    int fileSize = (int) fin.getChannel().size();
+//                    Log.d("WebRtcClient", "sending file of size " + fileSize);
+//                    //FileInputStream fin = new FileInputStream(uri.toString());
 //
-//                    bin.close();
-                    client.sendImage(fileSize, bytesArray, 0);
-                    fin.close();
+//                    //BufferedInputStream bin=new BufferedInputStream(fin);
+//                    int size1 = fileSize / 2;
+//                    int size2 = fileSize / 2;
+//                    if(fileSize %2 == 1) {
+//                        size2 += 1;
+//                    }
+//                    //size2 += 8;
+//                    //byte[] bytesArray = new byte[fileSize];
+//                    byte[] bytesArray1 = new byte[size1];
+//                    byte[] bytesArray2 = new byte[size2 + 5000];
+////                    fin.read(bytesArray);
+//                    fin.read(bytesArray1);
+//
+//                    for(int i = 0; i <5000;i++) {
+//                        bytesArray2[i] = bytesArray1[i];
+//                    }
+//                    fin.read(bytesArray2);
+//
+////                    fin.read(bytesArray2);
+////                    fin.read(bytesArray1, 0, size1);
+////                    fin.read(bytesArray2, 0, size2);
+//
+//                    Log.d("WebRtcClient", "sending file of size " + fileSize);
+////                    int i;
+////                    while((i=bin.read())!=-1){
+////                        charArr[i] = (char)i;
+////                    }
+////
+////                    bin.close();
+//                    //client.sendImage(fileSize, bytesArray, 0);
+                    client.sendImage(byteArray1.length, byteArray1, 0);
+                    client.sendImage(byteArray2.length, byteArray2, 1);
+//                    fin.close();
+                    in.close();
 
 
                 } catch (Exception e) {

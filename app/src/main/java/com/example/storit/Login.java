@@ -1,13 +1,16 @@
 package com.example.storit;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -17,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -180,6 +184,13 @@ public class Login extends AppCompatActivity {
         noAccountSignUp.setText(ss);
         noAccountSignUp.setMovementMethod(LinkMovementMethod.getInstance());
 
+        textForgotPass.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                showForgotPasswordDialog();
+            }
+        });
+
     }
 
     //onStart function
@@ -273,9 +284,78 @@ public class Login extends AppCompatActivity {
                 });
     }
 
-    public void goToForgotPassword(View v){
-        i = new Intent(this, Signup.class);
-        startActivity(i);
+    //set dialog for forgot password
+    private void showForgotPasswordDialog(){
+        //AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Forgot Password");
+
+        //set linear layout
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setFocusableInTouchMode(true);
+
+        //views to set in dialog
+
+        final EditText mEmailText = new EditText(this);
+        mEmailText.setHint("Email");
+        mEmailText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        mEmailText.setMinEms(10);
+
+        linearLayout.addView(mEmailText);
+        linearLayout.setPadding(10,10,10,10);
+
+        builder.setView(linearLayout);
+
+        //buttons
+        builder.setPositiveButton("Recover", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String email = mEmailText.getText().toString().trim();
+
+                //if email is null or empty send error
+                if (email.isEmpty()){
+                    Toast.makeText(Login.this, "Email is empty", Toast.LENGTH_SHORT).show();
+                } else{
+                    beginRecovery(email);
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Cancel dialog
+                dialog.dismiss();
+            }
+        });
+
+        //show dialog
+        builder.create().show();
+
+    }
+
+    //forgot password
+    private void beginRecovery(String email){
+        progressDialog.setMessage("Sending email...");
+        progressDialog.show();
+        mFirebaseAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        progressDialog.dismiss();
+                        if(task.isSuccessful()){
+                            Toast.makeText(Login.this, "Email Sent", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(Login.this, "Email Invalid", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                progressDialog.dismiss();
+                Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     //go To sign up activity

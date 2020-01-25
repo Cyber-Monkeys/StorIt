@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,6 +32,7 @@ public class Profile extends AppCompatActivity {
     private static final String TAG = "AndroidClarified ----";
     Toolbar toolbar;
     TextView changePhoto, textName, textUsername, textEmail, textBirthdate, toolbarTitle;
+    ImageView circularImage;
     Button editProfile;
     Calendar mCalendarDate;
     DocumentReference documentReference;
@@ -45,6 +48,7 @@ public class Profile extends AppCompatActivity {
 
         //initialize
         mCalendarDate = Calendar.getInstance();
+        circularImage = (ImageView) findViewById(R.id.circular_image);
         changePhoto = (TextView) findViewById(R.id.changePhoto);
         textName = (TextView) findViewById(R.id.textName);
         textUsername = (TextView) findViewById(R.id.textUsername);
@@ -58,6 +62,14 @@ public class Profile extends AppCompatActivity {
         if(firebaseUser != null){
             userId = firebaseUser.getUid();
             documentReference = db.collection("Users").document(userId);
+        }
+
+        //setting profile photo from firebase
+        if(firebaseUser.getPhotoUrl() != null){
+            //dependency used
+            Glide.with(this)
+                    .load(firebaseUser.getPhotoUrl())
+                    .into(circularImage);
         }
 
         //Toolbar for this page

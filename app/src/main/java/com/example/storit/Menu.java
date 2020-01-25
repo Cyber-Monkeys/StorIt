@@ -19,12 +19,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -57,6 +59,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     TextView headerEmail, headerName, toolbarTitle;
+    ImageView headerImage;
     BottomNavigationView bottomNavigationMenu;
     FloatingActionButton fab;
     private static final String TAG = "AndroidClarified ----";
@@ -80,6 +83,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         View hView = navigationView.getHeaderView(0);
         headerEmail = (TextView) hView.findViewById(R.id.headerEmail); //initialize headerEmail from navView
         headerName = (TextView) hView.findViewById(R.id.headerName); //initialize headerName from navView
+        headerImage = (ImageView) hView.findViewById(R.id.circular_image); //initialize headerProfile from navView
         drawerLayout = findViewById(R.id.drawer_layout);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -143,6 +147,14 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 Log.d(TAG, "FAILURE " + e.getMessage());
             }
         });
+
+        //setting profile photo from firebase
+        if(firebaseUser.getPhotoUrl() != null){
+            //dependency used
+            Glide.with(this)
+                    .load(firebaseUser.getPhotoUrl())
+                    .into(headerImage);
+        }
 
         //bottom navigation view
         bottomNavigationMenu = findViewById(R.id.bottom_navigation);

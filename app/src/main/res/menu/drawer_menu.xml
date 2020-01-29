@@ -5,27 +5,27 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_payment_details"
-            android:icon="@drawable/ic_cloud_black_24dp"
+            android:icon="@drawable/icons8_online_payment_24"
             android:title="Payment Details" />
         <item
             android:id="@+id/nav_plan"
-            android:icon="@drawable/ic_cloud_black_24dp"
+            android:icon="@drawable/icons8_crown_24"
             android:title="Plans" />
         <item
             android:id="@+id/nav_help"
-            android:icon="@drawable/ic_cloud_black_24dp"
+            android:icon="@drawable/icons8_help_24"
             android:title="Help" />
         <item
             android:id="@+id/nav_terms_and_condition"
-            android:icon="@drawable/ic_cloud_black_24dp"
+            android:icon="@drawable/icons8_terms_and_conditions_24"
             android:title="Terms &amp; Condition" />
         <item
             android:id="@+id/nav_faqs"
-            android:icon="@drawable/ic_cloud_black_24dp"
+            android:icon="@drawable/icons8_faq_24"
             android:title="FAQs" />
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/ic_cloud_black_24dp"
+            android:icon="@drawable/icons8_exit_24"
             android:title="Logout" />
     </group>
 

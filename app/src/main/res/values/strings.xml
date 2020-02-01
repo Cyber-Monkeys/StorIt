@@ -50,4 +50,9 @@ taking effect. What constitutes a material change will be determined at our sole
         If you have any questions about these Terms, please contact us.
     </string>
 
+    <string-array name="region">
+        <item>EU</item>
+        <item>NA</item>
+    </string-array>
+
 </resources>

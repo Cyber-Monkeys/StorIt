@@ -20,9 +20,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +48,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EditProfile extends AppCompatActivity {
+public class EditProfile extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     //variables
     private static final String TAG = "AndroidClarified ----";
@@ -63,6 +66,7 @@ public class EditProfile extends AppCompatActivity {
     private String userId;
     private Uri imageUri;
     private Bitmap bitmap;
+    private Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +86,7 @@ public class EditProfile extends AppCompatActivity {
         editUsername = (EditText) findViewById(R.id.editUsername);
         editEmail = (EditText) findViewById(R.id.editEmail);
         editBirthdate = (EditText) findViewById(R.id.editBirthdate);
+        spinner = findViewById(R.id.spinner);
 
         //setting profile photo from firebase
         if(firebaseUser.getPhotoUrl() != null){
@@ -153,6 +158,12 @@ public class EditProfile extends AppCompatActivity {
                 startActivityForResult(intent, PICK_IMAGE);
             }
         });
+
+        //add spinner for region picker
+        ArrayAdapter<CharSequence> regionAdapter = ArrayAdapter.createFromResource(this, R.array.region, android.R.layout.simple_spinner_item);
+        regionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(regionAdapter);
+        spinner.setOnItemSelectedListener(this); //enable click
     }
 
     //add save button in toolbar
@@ -302,4 +313,17 @@ public class EditProfile extends AppCompatActivity {
                 });
     }
 
+
+    //When spinner is selected
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String text = parent.getItemAtPosition(position).toString();
+        Toast.makeText(parent.getContext(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    //When spinner is not selected
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }

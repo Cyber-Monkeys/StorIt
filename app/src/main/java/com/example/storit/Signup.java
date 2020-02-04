@@ -138,6 +138,7 @@ public class Signup extends AppCompatActivity {
                                     user.put("Last Name", lastName);
                                     user.put("Email", email);
                                     user.put("Birthdate", mCalendarDate.getTime());
+                                    user.put("directory", "");
 
                                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override

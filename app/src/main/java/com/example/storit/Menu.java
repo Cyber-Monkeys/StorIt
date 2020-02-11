@@ -29,6 +29,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -66,7 +67,8 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     ActionBarDrawerToggle actionBarDrawerToggle;
     DrawerLayout drawerLayout;
     Toolbar toolbar;
-    TextView headerEmail, headerName;
+    TextView headerEmail, headerName, toolbarTitle;
+    ImageView headerImage;
     BottomNavigationView bottomNavigationMenu;
     FloatingActionButton fab;
     private static final String TAG = "AndroidClarified ----";
@@ -107,6 +109,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         View hView = navigationView.getHeaderView(0);
         headerEmail = (TextView) hView.findViewById(R.id.headerEmail); //initialize headerEmail from navView
         headerName = (TextView) hView.findViewById(R.id.headerName); //initialize headerName from navView
+        headerImage = (ImageView) hView.findViewById(R.id.circular_image); //initialize headerProfile from navView
         drawerLayout = findViewById(R.id.drawer_layout);
         toolbar = findViewById(R.id.toolbar);
 
@@ -175,6 +178,14 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
+        //setting profile photo from firebase
+        if(firebaseUser.getPhotoUrl() != null){
+            //dependency used
+            Glide.with(this)
+                    .load(firebaseUser.getPhotoUrl())
+                    .into(headerImage);
+        }
+
         //bottom navigation view
         bottomNavigationMenu = findViewById(R.id.bottom_navigation);
         bottomNavigationMenu.clearAnimation();
@@ -208,6 +219,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                 clientFragment, "MY_FRAGMENT_CLIENT").commit();
         getSupportActionBar().setTitle("Client");
+        toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title); //set toolbar title
+        toolbarTitle.setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         navigationView.setCheckedItem(R.id.action_client);
 
     }
@@ -226,8 +240,8 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         bottomSheetDialog.dismiss();
         this.fileUploading = fileName;
     }
-    public  void downloadData(String fileName) {
-        Context context = this;
+    public  void downloadData(final String fileName) {
+        final Context context = this;
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         String uniqueID = UUID.randomUUID().toString();
         mUser.getIdToken(true)
@@ -320,7 +334,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                     switch(menuItem.getItemId()){
                         case R.id.action_client:
                             index = CLIENT;
+                            getSupportActionBar().setDisplayShowTitleEnabled(true);
                             getSupportActionBar().setTitle("Client");
+                            toolbarTitle.setText(toolbar.getTitle());
+                            getSupportActionBar().setDisplayShowTitleEnabled(false);
                             //show client page
                             if(getSupportFragmentManager().findFragmentByTag("MY_FRAGMENT_CLIENT") != null) {
                                 //if the fragment exists, show it.
@@ -336,7 +353,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                             break;
                         case R.id.action_server:
                             index = SERVER;
+                            getSupportActionBar().setDisplayShowTitleEnabled(true);
                             getSupportActionBar().setTitle("Server");
+                            toolbarTitle.setText(toolbar.getTitle());
+                            getSupportActionBar().setDisplayShowTitleEnabled(false);
                             //show server page
                             if(getSupportFragmentManager().findFragmentByTag("MY_FRAGMENT_SERVER") != null) {
                                 //if the fragment exists, show it.
@@ -480,10 +500,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     }
     public void addServer(View V) {
         // you need to change this later so that you verify if the current device is already running a server?
-        int storageSize = setSeekbar.getProgress();
+        final int storageSize = setSeekbar.getProgress();
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-        Context context = this;
-        String uniqueID = getDeviceId();
+        final Context context = this;
+        final String uniqueID = getDeviceId();
 
         mUser.getIdToken(true)
                 .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {

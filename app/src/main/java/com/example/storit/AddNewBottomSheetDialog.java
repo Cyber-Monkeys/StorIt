@@ -101,7 +101,7 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("STORIT---", "GOT TO ACTIVITY RESULT");
         if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
@@ -111,7 +111,7 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                 Log.d("STORIT---", "DATA IS NOT NULLst");
                 Uri uri = data.getData();
 
-                String filePath = getFileName(uri);
+                final String filePath = getFileName(uri);
 
                 Log.d("STORIT---", "file path = " + filePath);
                 FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();

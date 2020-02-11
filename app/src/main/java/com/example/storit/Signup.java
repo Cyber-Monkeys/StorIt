@@ -134,8 +134,7 @@ public class Signup extends AppCompatActivity {
 
                                     Map<String, Object> user = new HashMap<>();
                                     user.put("Username", username);
-                                    user.put("First Name", firstName);
-                                    user.put("Last Name", lastName);
+                                    user.put("Name", firstName + " " + lastName);
                                     user.put("Email", email);
                                     user.put("Birthdate", mCalendarDate.getTime());
                                     user.put("directory", "");

@@ -3,36 +3,135 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:textSize="20sp"
-        android:text="Name down" />
+        android:layout_height="50dp"
+        android:weightSum="100"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:textSize="20sp"
-        android:text="Name up" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="15"
+            android:gravity="center"
+            android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:textSize="20sp"
-        android:text="Size down" />
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_arrow_upward_grey_16dp"/>
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView4"
+        <TextView
+            android:id="@+id/textNameUp"
+            android:layout_width="0dp"
+            android:layout_weight="85"
+            android:gravity="center_vertical"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:text="Name" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:textSize="20sp"
-        android:text="Size up" />
+        android:layout_height="0.5dp"
+        android:background="#b0b0b0"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:weightSum="100"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="15"
+            android:gravity="center"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_arrow_downward_black_24dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textNameDown"
+            android:layout_width="0dp"
+            android:layout_weight="85"
+            android:gravity="center_vertical"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:text="Name" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#b0b0b0"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:weightSum="100"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="15"
+            android:gravity="center"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_arrow_upward_grey_16dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textRemove"
+            android:layout_width="0dp"
+            android:layout_weight="85"
+            android:gravity="center_vertical"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:text="Size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#b0b0b0"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:weightSum="100"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="15"
+            android:gravity="center"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_arrow_downward_black_24dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="85"
+            android:gravity="center_vertical"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:text="Size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#b0b0b0"/>
 
 </LinearLayout>

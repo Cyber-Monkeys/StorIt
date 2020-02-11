@@ -8,11 +8,13 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 public class Plans extends AppCompatActivity {
 
     //Variables
     Toolbar toolbar;
+    TextView toolbarTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +23,11 @@ public class Plans extends AppCompatActivity {
 
         //Toolbar for this page
         toolbar = findViewById(R.id.toolbar);
+        toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Plans");
+        toolbarTitle.setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         final Drawable goBack = getResources().getDrawable(R.drawable.ic_go_back);

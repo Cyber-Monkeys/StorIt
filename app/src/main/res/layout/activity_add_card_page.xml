@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddCardPage">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#2196F3"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/AppTheme" >
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:layout_gravity="center" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <EditText
+        android:id="@+id/editCreditName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="46dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Credit holder name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <EditText
+        android:id="@+id/editCreditNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="39dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Credit card number"
+        app:layout_constraintEnd_toEndOf="@+id/editCreditName"
+        app:layout_constraintStart_toStartOf="@+id/editCreditName"
+        app:layout_constraintTop_toBottomOf="@+id/editCreditName" />
+
+    <EditText
+        android:id="@+id/editCvv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="CVV"
+        app:layout_constraintEnd_toEndOf="@+id/editCreditNum"
+        app:layout_constraintStart_toStartOf="@+id/editCreditNum"
+        app:layout_constraintTop_toBottomOf="@+id/editCreditNum" />
+
+    <EditText
+        android:id="@+id/editMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Month"
+        app:layout_constraintEnd_toEndOf="@+id/editCvv"
+        app:layout_constraintStart_toStartOf="@+id/editCvv"
+        app:layout_constraintTop_toBottomOf="@+id/editCvv"/>
+
+    <EditText
+        android:id="@+id/editYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Year"
+        app:layout_constraintEnd_toEndOf="@+id/editMonth"
+        app:layout_constraintStart_toStartOf="@+id/editMonth"
+        app:layout_constraintTop_toBottomOf="@+id/editMonth" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="Button"
+        app:layout_constraintEnd_toEndOf="@+id/editYear"
+        app:layout_constraintStart_toStartOf="@+id/editYear"
+        app:layout_constraintTop_toBottomOf="@+id/editYear" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

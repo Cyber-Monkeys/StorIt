@@ -14,4 +14,14 @@
         <item name="android:scaleY">0.8</item>
     </style>
 
+<!--    for save menu-->
+    <style name="MenuItems" parent="AppTheme">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>

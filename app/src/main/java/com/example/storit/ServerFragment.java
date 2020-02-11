@@ -1,12 +1,16 @@
 package com.example.storit;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,6 +20,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.ListFragment;
 
 import java.util.ArrayList;
+
+import io.feeeei.circleseekbar.CircleSeekBar;
 
 public class ServerFragment extends ListFragment {
 
@@ -40,8 +46,17 @@ public class ServerFragment extends ListFragment {
 
         //add example
         serverListAdapter.add(new Server("Server1", 1000));
-        serverListAdapter.add(new Server("Server2", 1000));
+//        serverListAdapter.add(new Server("Server2", 1000));
         serverListAdapter.notifyDataSetChanged();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                startActivity(new Intent(getActivity(), ServerInformation.class));
+            }
+        });
+
+
 
     }
 }

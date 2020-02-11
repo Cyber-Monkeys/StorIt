@@ -1,5 +1,6 @@
 package com.example.storit;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -233,6 +235,7 @@ public class WebRtcClient {
             } else if (type.equals("-d")) {
                 Log.d(TAG, "-dreceived request of type download");
 //                ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                image = (ImageView) context.layout.findViewById(R.id.dialogImage);
                 Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -253,7 +256,7 @@ public class WebRtcClient {
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        image.setImageBitmap(bmp);
+                        context.showImage(bmp);
                     }
                 });
                 for(String key : peers.keySet()) {
@@ -325,7 +328,7 @@ public class WebRtcClient {
             context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                image.setImageBitmap(combinedbmp);
+                context.showImage(combinedbmp);
             }
         });
 
@@ -773,8 +776,10 @@ public class WebRtcClient {
 
     private void removePeer(String id) {
         Peer peer = peers.get(id);
-        peer.localDataChannel.close();
-        peer.remoteDataChannel.close();
+        if(peer.localDataChannel.state() != DataChannel.State.CLOSED)
+            peer.localDataChannel.close();
+        if(peer.remoteDataChannel.state() != DataChannel.State.CLOSED)
+            peer.remoteDataChannel.close();
         peer.pc.close();
         peers.remove(peer.id);
         endPoints[peer.endPoint] = false;
@@ -783,7 +788,7 @@ public class WebRtcClient {
     public WebRtcClient(String host, Menu _context, String type) {
         context = _context;
         this.type = type;
-        PeerConnectionFactory.initializeAndroidGlobals(_context, true, true,false, null);
+        PeerConnectionFactory.initializeAndroidGlobals(_context, true, true, false, null);
         factory = new PeerConnectionFactory();
         MessageHandler messageHandler = new MessageHandler();
 
@@ -811,10 +816,11 @@ public class WebRtcClient {
         pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "false"));
         pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "false"));
         pcConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
-        if(type.equals("server"))
-            image = (ImageView) context.findViewById(R.id.receivedImage);
-        else
-            image = (ImageView) context.findViewById(R.id.downloadedImage);
+//        if (type.equals("server") && requestType.equals("serverDownload")) {
+//            image = (ImageView) context.layout.findViewById(R.id.dialogImage);
+//        }
+//        else
+//            image = (ImageView) context.findViewById(R.id.dialogImage);
 
     }
     public void emitServer(String token, int storageSize, String deviceId) {

@@ -6,6 +6,7 @@
         android:id="@+id/save_button"
         android:orderInCategory="100"
         android:title="Save"
+        app:itemTextAppearance="@style/MenuItems"
         app:showAsAction="always"/>
 
 </menu>

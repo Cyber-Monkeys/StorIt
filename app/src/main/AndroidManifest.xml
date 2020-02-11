@@ -12,8 +12,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Login"
-            android:screenOrientation="portrait"></activity>
+        <activity android:name=".EditServer"></activity>
+        <activity android:name=".ServerInformation" />
+        <activity android:name=".AddCardPage" />
+        <activity
+            android:name=".Login"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EditProfile"
             android:theme="@style/AppTheme.NoActionBar" />

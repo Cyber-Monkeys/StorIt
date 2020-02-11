@@ -15,7 +15,7 @@
     <string name="termsAndCondition">
         Last updated: 10-10-2019 \n
         Please read these Terms and Conditions carefully before using
-        the <b>http://www.CyberMonkeys.com</b> website and Plan-O mobile
+        the <b>http://www.CyberMonkeys.com</b> website and StorIT mobile
 application (the "Service") operated by CyberMonkeys.
 Your access to and use of the Service is conditioned on your acceptance of and compliance with
 these Terms. These Terms apply to all visitors, users and others who access or use the Service.\n\n
@@ -37,7 +37,7 @@ The Content section is for businesses that allow users to create, edit, share, m
 their websites or apps. For the full disclosure section, create your own Terms and Conditions. \n\n
 
         Our Service may contain links to third-party web sites or services that are not owned or controlled
-by Plan-O. CyberMonkeys has no control over, and assumes no responsibility for, the content,
+by StorIT. CyberMonkeys has no control over, and assumes no responsibility for, the content,
 privacy policies, or practices of any third party web sites or services. You further acknowledge and
 agree that My Company (change this) shall not be responsible or liable, directly or indirectly, for any
 damage or loss caused or alleged to be caused by or in connection with use of or reliance on any
@@ -52,7 +52,7 @@ taking effect. What constitutes a material change will be determined at our sole
 
     <string-array name="region">
         <item>EU</item>
-        <item>NA</item>
+        <item>NAf</item>
     </string-array>
 
 </resources>

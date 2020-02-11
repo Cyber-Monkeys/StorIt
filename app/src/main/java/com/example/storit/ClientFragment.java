@@ -1,12 +1,16 @@
 package com.example.storit;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,11 +22,10 @@ public class ClientFragment extends Fragment {
     GridView gridView;
     TextView sortName;
 
-    String[] fileName = {"Hello","Hello","Hello","Hello","Hello","Hello","Hello","Hello","Hello","Hello","Hello",};
-
-    int[] image = {R.drawable.background_2,R.drawable.background_2,R.drawable.background_2,R.drawable.background_2,R.drawable.background_2,
-            R.drawable.background_2,R.drawable.background_2,R.drawable.background_2,R.drawable.background_2,R.drawable.background_2,
-            R.drawable.background_2};
+    private ArrayList<String> fileName = new ArrayList<String>();
+    static int fileImage = R.drawable.background_2;
+    private ArrayList<Integer> image = new ArrayList<Integer>();
+    private ClientAdapter clientAdapter;
 
     @Nullable
     @Override
@@ -37,8 +40,18 @@ public class ClientFragment extends Fragment {
         sortName = getView().findViewById(R.id.sortName);
         gridView = getView().findViewById(R.id.gridView);
 
-        ClientAdapter clientAdapter = new ClientAdapter(getView().getContext(),fileName,image);
+        clientAdapter = new ClientAdapter(getView().getContext(),fileName.toArray(new String[fileName.size()]), image.toArray(new Integer[image.size()]));
         gridView.setAdapter(clientAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                    long arg3) {
+                Log.d("Webrtcclient", "download request started");
+                ((Menu) getActivity()).downloadData(fileName.get(arg2));
+            }
+
+        });
 
         sortName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +60,15 @@ public class ClientFragment extends Fragment {
                 bottomSheetDialog.show(getFragmentManager(), "SortBottomSheet");
             }
         });
+
+    }
+    public void addFile(String name) {
+        fileName.add(name);
+        image.add(fileImage);
+    }
+    public void refreshAdapter() {
+        clientAdapter = new ClientAdapter(getView().getContext(), fileName.toArray(new String[fileName.size()]),image.toArray(new Integer[image.size()]));
+        gridView.setAdapter(clientAdapter);
 
     }
 

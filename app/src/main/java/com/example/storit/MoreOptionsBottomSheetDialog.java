@@ -6,11 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import org.w3c.dom.Text;
 
 public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
 
@@ -20,5 +23,4 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.bottom_sheet_more_options, container, false);
         return view;
     }
-
 }

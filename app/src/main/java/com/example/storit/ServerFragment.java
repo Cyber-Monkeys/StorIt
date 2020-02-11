@@ -19,6 +19,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.ListFragment;
 
+
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
+
 import java.util.ArrayList;
 
 import io.feeeei.circleseekbar.CircleSeekBar;
@@ -44,9 +52,14 @@ public class ServerFragment extends ListFragment {
         serverListAdapter = new ServerListAdapter(getActivity());
         setListAdapter(serverListAdapter);
 
-        //add example
-        serverListAdapter.add(new Server("Server1", 1000));
+//        //add example
+//        serverListAdapter.add(new Server("Server1", 1000));
 //        serverListAdapter.add(new Server("Server2", 1000));
+//        serverListAdapter.notifyDataSetChanged();
+
+    }
+    public void addNewServer() {
+        serverListAdapter.add(new Server("Server1", 1000));
         serverListAdapter.notifyDataSetChanged();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

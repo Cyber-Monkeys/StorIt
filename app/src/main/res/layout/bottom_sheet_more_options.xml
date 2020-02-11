@@ -70,7 +70,7 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/downloadTextView"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:weightSum="100"

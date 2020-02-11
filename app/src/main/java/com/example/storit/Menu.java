@@ -9,8 +9,10 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,22 +32,28 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class Menu extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -66,11 +74,26 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     FirebaseAuth mFirebaseAuth;
     FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleSignInClient mGoogleSignInClient;
+    ServerFragment serverFragment;
+    //Fragment serverFragment;
 
     DocumentReference documentReference;
     String userId;
     private FirebaseFirestore db;
     FirebaseUser firebaseUser;
+    AlertDialog dialog;
+    TextView seekBarText;
+    SeekBar setSeekbar;
+
+    WebRtcClient server = null;
+    WebRtcClient client = null;
+    static  String deviceId;
+    ClientFragment clientFragment;
+    String fullDirectory = "";
+    String fileUploading = "";
+
+
+    static String sharedPrefDbName = "STORITDB";
 
     //onCreate function
     @Override
@@ -86,8 +109,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         headerImage = (ImageView) hView.findViewById(R.id.circular_image); //initialize headerProfile from navView
         drawerLayout = findViewById(R.id.drawer_layout);
         toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
+
+        setSupportActionBar(toolbar);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -123,7 +147,6 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 startActivity(new Intent(Menu.this, Profile.class));
             }
         });
-
         //Setting header email and username from database
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -131,7 +154,11 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 if(documentSnapshot.exists()){
                     String email = documentSnapshot.getString("Email");
                     String name = documentSnapshot.getString("Name");
-
+                    String directory = documentSnapshot.getString("directory");
+                    if(directory != null) {
+                        fullDirectory = directory;
+                    }
+                    loadDirectory();
                     if (name == null){
                         headerName.setText("Username");
                     }else{
@@ -185,7 +212,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
         //Set fragment to client first
         index = CLIENT;
-        Fragment clientFragment = new ClientFragment();
+        clientFragment = new ClientFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                 clientFragment, "MY_FRAGMENT_CLIENT").commit();
         getSupportActionBar().setTitle("Client");
@@ -202,10 +229,68 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         mFirebaseAuth.addAuthStateListener(mAuthListener);
     }
 
+    public void uploadData(String idToken,Intent data, String fileName) {
+        Context context = this;
+        if(client == null)
+            client = new WebRtcClient("https://www.vrpacman.com", (Menu) context, "client");
+        client.emitUpload(idToken,"serverUpload", data);
+        this.fileUploading = fileName;
+    }
+    public  void downloadData(final String fileName) {
+        final Context context = this;
+        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        String uniqueID = UUID.randomUUID().toString();
+        mUser.getIdToken(true)
+                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+                            Log.d("webrtcclient", "token verified and request begins");
+                            if(client == null)
+                                client = new WebRtcClient("https://www.vrpacman.com", (Menu) context, "client");
+                            client.emitDownload(idToken,"serverDownload", fileName);
+
+                        } else {
+                            // Handle error -> task.getException();
+                            Log.d("res3", "no token verified");
+                        }
+                    }
+                });
+    }
+
+
     //sign out account
     private void signOut(){
         mFirebaseAuth.signOut();
         mGoogleSignInClient.signOut();
+    }
+
+    public void loadDirectory() {
+        String[] files = fullDirectory.split(",");
+        for(int i = 0;i < files.length;i++) {
+            this.clientFragment.addFile(files[i]);
+        }
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                clientFragment.refreshAdapter();
+            }
+        });
+    }
+    public void addFile(String fileUploadedName) {
+        this.clientFragment.addFile(fileUploadedName);
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                clientFragment.refreshAdapter();
+            }
+        });
+    }
+    public void doneUploading() {
+        if(!fileUploading.equals("")) {
+            addFile(fileUploading);
+//            loadDirectory(fileUploading);
+        }
     }
 
     //navigation drawer
@@ -274,7 +359,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                                 getSupportFragmentManager().beginTransaction().show(getSupportFragmentManager()
                                         .findFragmentByTag("MY_FRAGMENT_SERVER")).commit();
                             }else{
-                                Fragment serverFragment = new ServerFragment();
+                                serverFragment = new ServerFragment();
                                 getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                                         serverFragment, "MY_FRAGMENT_SERVER").commit();
                             }
@@ -294,7 +379,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     private void addServerDialog() {
         //Create alertDialog
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final AlertDialog dialog = builder.create();
+
         //Custom title
         TextView title = new TextView(this);
         title.setText("Add Server");
@@ -311,8 +396,8 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         builder.setView(layout);
 
         //Set seekbar amount of storage
-        SeekBar setSeekbar = (SeekBar)layout.findViewById(R.id.seekBar);
-        final TextView seekBarText = (TextView)layout.findViewById(R.id.textViewSeekBar);
+        setSeekbar = (SeekBar)layout.findViewById(R.id.seekBar);
+        seekBarText = (TextView)layout.findViewById(R.id.textViewSeekBar);
         setSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -340,14 +425,84 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "HELLO", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        addButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getApplicationContext(), "HELLO", Toast.LENGTH_SHORT).show();
+//                // start server by connecting to sockets and emitting server event
+//
+//            }
+//        });
 
         //show dialog
-        builder.create().show();
+        dialog = builder.create();
+        dialog.show();
+
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (client != null) {
+            client.onDestroy();
+        }
+    }
+    public void addServer(View V) {
+        // you need to change this later so that you verify if the current device is already running a server?
+        final int storageSize = setSeekbar.getProgress();
+        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        final Context context = this;
+        final String uniqueID = getDeviceId();
+
+        mUser.getIdToken(true)
+                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+                            if(server == null) {
+                                serverFragment.addNewServer();
+                                server = new WebRtcClient("https://www.vrpacman.com/", (Menu) context, "server");
+                            }
+
+                            server.emitServer(idToken, storageSize, uniqueID);
+                        } else {
+                            // Handle error -> task.getException();
+                            Log.d("res3", "no token verified");
+                        }
+                    }
+                });
+
+        dialog.dismiss();
+    }
+    public String getDeviceId() {
+        //if the deviceId is not null, return it
+        if(deviceId != null){
+            return deviceId;
+        }//end
+
+        //shared preferences
+        SharedPreferences sharedPref = this.getSharedPreferences(sharedPrefDbName,this.MODE_PRIVATE);
+
+        //lets get the device Id
+        deviceId = sharedPref.getString("device_id",null);
+
+        //if the saved device Id is null, lets create it and save it
+
+        if(deviceId == null) {
+
+            //generate new device id
+            deviceId = UUID.randomUUID().toString();
+
+            //Shared Preference editor
+            SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
+
+            //save the device id
+            sharedPrefEditor.putString("device_id",deviceId);
+
+            //commit it
+            sharedPrefEditor.commit();
+        }//end if device id was null
+
+        //return
+        return deviceId;
     }
 }

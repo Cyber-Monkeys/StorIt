@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -91,6 +92,8 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     ClientFragment clientFragment;
     String fullDirectory = "";
     String fileUploading = "";
+    AddNewBottomSheetDialog bottomSheetDialog;
+    View layout;
 
 
     static String sharedPrefDbName = "STORITDB";
@@ -202,7 +205,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddNewBottomSheetDialog bottomSheetDialog = new AddNewBottomSheetDialog();
+                bottomSheetDialog = new AddNewBottomSheetDialog();
                 if (index == CLIENT)
                     bottomSheetDialog.show(getSupportFragmentManager(), "AddNewBottomSheet");
                 else if (index == SERVER)
@@ -234,6 +237,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         if(client == null)
             client = new WebRtcClient("https://www.vrpacman.com", (Menu) context, "client");
         client.emitUpload(idToken,"serverUpload", data);
+        bottomSheetDialog.dismiss();
         this.fileUploading = fileName;
     }
     public  void downloadData(final String fileName) {
@@ -267,7 +271,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
     public void loadDirectory() {
         String[] files = fullDirectory.split(",");
-        for(int i = 0;i < files.length;i++) {
+        for (int i = 1; i < files.length; i++) {
             this.clientFragment.addFile(files[i]);
         }
         this.runOnUiThread(new Runnable() {
@@ -439,6 +443,54 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         dialog.show();
 
     }
+
+    public void showImage(Bitmap bmp) {
+        //Create alertDialog
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        //Custom title
+//        TextView title = new TextView(this);
+//        title.setText("Add Server");
+//        title.setPadding(10, 10, 10, 10);
+//        title.setGravity(Gravity.CENTER);
+//        title.setTextColor(Color.BLACK);
+//        title.setTextSize(20);
+//        builder.setCustomTitle(title);
+
+        //Create a custom layout for the dialog box
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        layout = inflater.inflate(R.layout.custom_image_dialog, null);
+
+        builder.setView(layout);
+
+        ImageView imgView = (ImageView) layout.findViewById(R.id.dialogImage);
+        imgView.setImageBitmap(bmp);
+
+
+        Button closeButton = (Button)layout.findViewById(R.id.closeDialog);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+//        addButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getApplicationContext(), "HELLO", Toast.LENGTH_SHORT).show();
+//                // start server by connecting to sockets and emitting server event
+//
+//            }
+//        });
+
+        //show dialog
+        dialog = builder.create();
+        dialog.show();
+
+    }
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();

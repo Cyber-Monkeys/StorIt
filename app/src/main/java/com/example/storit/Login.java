@@ -137,9 +137,11 @@ public class Login extends AppCompatActivity {
                 if(email.isEmpty()){
                     emailText.setError("Please enter Email");
                     emailText.requestFocus();
+                    progressDialog.dismiss();
                 }else if(password.isEmpty()){
                     passwordText.setError("Please enter Password");
                     passwordText.requestFocus();
+                    progressDialog.dismiss();
                 }else if(!(email.isEmpty() && password.isEmpty())){
                     mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
                         @Override

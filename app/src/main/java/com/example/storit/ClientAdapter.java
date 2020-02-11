@@ -18,10 +18,10 @@ public class ClientAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater inflater;
     private String[] fileNameArr;
-    private int[] imageArr;
+    private Integer[] imageArr;
 
     //constructor
-    public ClientAdapter(Context context, String[] fileName, int[] image){
+    public ClientAdapter(Context context, String[] fileName, Integer[] image){
         this.context = context;
         this.fileNameArr = fileName;
         this.imageArr = image;

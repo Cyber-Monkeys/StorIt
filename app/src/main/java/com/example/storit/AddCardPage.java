@@ -10,9 +10,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,17 +29,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddCardPage extends AppCompatActivity {
+public class AddCardPage extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     //Variables
     private static final String TAG = "-----------------------";
     Toolbar toolbar;
-    EditText creditName, creditNum, cvv, month, year;
+    EditText creditName, creditNum, cvv;
     Button addCard;
+    Spinner monthSpinner, yearSpinner;
     private FirebaseFirestore db;
     CollectionReference userPayments;
     FirebaseAuth firebaseAuth;
-    String userId;
+    String userId, month, year;
     FirebaseUser firebaseUser;
 
     @Override
@@ -72,20 +77,20 @@ public class AddCardPage extends AppCompatActivity {
         });
 
         creditName = findViewById(R.id.editCreditName);
-        creditNum = findViewById(R.id.editCreditNum);
+        creditNum = findViewById(R.id.editCreditName);
         cvv = findViewById(R.id.editCvv);
-        month = findViewById(R.id.editMonth);
-        year = findViewById(R.id.editYear);
+        monthSpinner = findViewById(R.id.monthSpinner);
+        yearSpinner = findViewById(R.id.yearSpinner);
         addCard = findViewById(R.id.button);
 
         addCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String mName = creditName.getText().toString();
-                int mNum = Integer.parseInt(creditNum.getText().toString());
+                long mNum = Long.parseLong(creditNum.getText().toString());
                 int mCvv = Integer.parseInt(cvv.getText().toString());
-                int mMonth = Integer.parseInt(month.getText().toString());
-                int mYear = Integer.parseInt(year.getText().toString());
+                int mMonth = Integer.parseInt(month);
+                int mYear = Integer.parseInt(year);
 
                 //store Classes in database
                 Map<String, Object> user = new HashMap<>();
@@ -113,5 +118,43 @@ public class AddCardPage extends AppCompatActivity {
             }
         });
 
+        //add spinner for month picker
+        ArrayAdapter<CharSequence> monthAdapter = ArrayAdapter.createFromResource(this, R.array.months, android.R.layout.simple_spinner_item);
+        monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        monthSpinner.setAdapter(monthAdapter);
+        monthSpinner.setOnItemSelectedListener(this); //enable click
+        //add spinner for year picker
+        ArrayAdapter<CharSequence> yearAdapter = ArrayAdapter.createFromResource(this, R.array.years, android.R.layout.simple_spinner_item);
+        yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        yearSpinner.setAdapter(yearAdapter);
+        yearSpinner.setOnItemSelectedListener(this); //enable click
+
     }
+
+    //When spinner is selected
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        if (parent.getId() == R.id.monthSpinner){
+            if (parent.getItemAtPosition(position).equals("Month")){
+                //do nothings
+            }
+            month = parent.getItemAtPosition(position).toString();
+            Toast.makeText(parent.getContext(), month, Toast.LENGTH_SHORT).show();
+
+        } else {
+            if (parent.getItemAtPosition(position).equals("Year")){
+                //do nothings
+            }
+            year = parent.getItemAtPosition(position).toString();
+            Toast.makeText(parent.getContext(), year, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    //When spinner is not selected
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
 }

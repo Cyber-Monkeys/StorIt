@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class Plans extends AppCompatActivity {
@@ -15,6 +16,7 @@ public class Plans extends AppCompatActivity {
     //Variables
     Toolbar toolbar;
     TextView toolbarTitle;
+    LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,14 @@ public class Plans extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Plans.this, Menu.class));
+            }
+        });
+
+        linearLayout = findViewById(R.id.linearLayout1);
+        linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Plans.this, PurchasePlan.class));
             }
         });
     }

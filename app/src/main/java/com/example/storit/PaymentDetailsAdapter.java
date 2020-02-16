@@ -1,10 +1,12 @@
 package com.example.storit;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -36,7 +38,8 @@ public class PaymentDetailsAdapter extends ArrayAdapter<CreditCard> {
 
         String cardName = getItem(position).getCardName();
         int cardNum = getItem(position).getCardNumber();
-
+        int month = getItem(position).getMonth();
+        int year = getItem(position).getYear();
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
 
@@ -44,11 +47,21 @@ public class PaymentDetailsAdapter extends ArrayAdapter<CreditCard> {
             convertView = inflater.inflate(mResource, parent, false);
         }
 
-        TextView tvName = (TextView) convertView.findViewById(R.id.textView);
-        TextView tvCardNum = (TextView) convertView.findViewById(R.id.textView2);
+        TextView tvName = (TextView) convertView.findViewById(R.id.cardName);
+        TextView tvCardNum = (TextView) convertView.findViewById(R.id.cardNum);
+        TextView tvExpiryDate = (TextView) convertView.findViewById(R.id.expireDate);
+        Button editCard = convertView.findViewById(R.id.editCard);
 
         tvName.setText(cardName);
         tvCardNum.setText(""+cardNum);
+        tvExpiryDate.setText(month + "/" + year);
+
+        editCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContext.startActivity(new Intent(getContext(), EditPaymentDetails.class));
+            }
+        });
 
         return convertView;
 

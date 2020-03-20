@@ -4,31 +4,33 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/fileFolderInfo"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:weightSum="100"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="15"
-            android:gravity="center"
-            android:layout_height="match_parent">
+            android:gravity="center">
 
             <ImageView
+                android:id="@+id/fileFolderImage"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icons8_folder_30"/>
+                android:src="@drawable/icons8_folder_30" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/textFolder"
+            android:id="@+id/fileFolderName"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="85"
             android:gravity="center_vertical"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:text="Folder" />
+            android:text="Folder"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -37,31 +39,32 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
+        android:id="@+id/shareButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:weightSum="100"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="15"
-            android:gravity="center"
-            android:layout_height="match_parent">
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icons8_shared_document_24"/>
+                android:src="@drawable/icons8_shared_document_24" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/textShare"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="85"
             android:gravity="center_vertical"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:text="Share" />
+            android:text="Share"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -70,7 +73,7 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
-        android:id="@+id/downloadTextView"
+        android:id="@+id/downloadButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:weightSum="100"
@@ -104,31 +107,32 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
+        android:id="@+id/moveButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:weightSum="100"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="15"
-            android:gravity="center"
-            android:layout_height="match_parent">
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icons8_send_file_24"/>
+                android:src="@drawable/icons8_send_file_24" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/textMove"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="85"
             android:gravity="center_vertical"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:text="Move" />
+            android:text="Move"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -137,31 +141,32 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
+        android:id="@+id/duplicateButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:weightSum="100"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="15"
-            android:gravity="center"
-            android:layout_height="match_parent">
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icons8_copy_30"/>
+                android:src="@drawable/icons8_copy_30" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/textDuplicate"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="85"
             android:gravity="center_vertical"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:text="Duplicate" />
+            android:text="Duplicate"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -170,31 +175,32 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
+        android:id="@+id/detailsButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:weightSum="100"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="15"
-            android:gravity="center"
-            android:layout_height="match_parent">
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icons8_info_30"/>
+                android:src="@drawable/icons8_info_30" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/textDetails"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="85"
             android:gravity="center_vertical"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:text="Details" />
+            android:text="Details"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -203,31 +209,32 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
+        android:id="@+id/backupButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:weightSum="100"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="15"
-            android:gravity="center"
-            android:layout_height="match_parent">
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icons8_copy_30"/>
+                android:src="@drawable/icons8_copy_30" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/textBackup"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="85"
             android:gravity="center_vertical"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:text="Backup" />
+            android:text="Backup"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -236,31 +243,32 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
+        android:id="@+id/removeButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:weightSum="100"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="15"
-            android:gravity="center"
-            android:layout_height="match_parent">
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icons8_trash_30"/>
+                android:src="@drawable/icons8_trash_30" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/textRemove"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="85"
             android:gravity="center_vertical"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:text="Remove" />
+            android:text="Remove"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout

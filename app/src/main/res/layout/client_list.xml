@@ -30,7 +30,7 @@
         <TextView
             android:id="@+id/fileName"
             android:layout_width="0dp"
-            android:layout_weight="70"
+            android:layout_weight="80"
             android:layout_height="wrap_content"
             android:text="TextView" />
 
@@ -38,7 +38,7 @@
             android:id="@+id/moreOptions"
             android:layout_gravity="center_vertical"
             android:scaleType="fitXY"
-            android:layout_weight="30"
+            android:layout_weight="20"
             android:layout_width="0dp"
             android:layout_height="16dp"
             app:srcCompat="@drawable/ic_more_horiz_grey_16dp" />

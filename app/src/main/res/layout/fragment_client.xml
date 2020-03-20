@@ -18,7 +18,7 @@
         android:drawablePadding="15dp"
         android:drawableLeft="@drawable/ic_search_grey_24dp"
         android:drawableStart="@drawable/ic_search_grey_24dp"
-        android:text="Search"
+        android:hint="Search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -46,6 +46,7 @@
             android:id="@+id/sortName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
             android:text="Sort by" />
 
         <ImageView
@@ -54,6 +55,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_arrow_upward_grey_16dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/goBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="1dp"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText2">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_arrow_back_grey_24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go back" />
 
     </LinearLayout>
 
@@ -68,7 +93,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sortBy" >
-
     </GridView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

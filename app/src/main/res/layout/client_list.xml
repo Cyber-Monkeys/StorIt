@@ -30,17 +30,17 @@
         <TextView
             android:id="@+id/fileName"
             android:layout_width="0dp"
-            android:layout_weight="80"
-            android:layout_height="wrap_content"
+            android:layout_height="19dp"
+            android:layout_weight="75"
             android:text="TextView" />
 
         <ImageView
             android:id="@+id/moreOptions"
-            android:layout_gravity="center_vertical"
-            android:scaleType="fitXY"
-            android:layout_weight="20"
             android:layout_width="0dp"
-            android:layout_height="16dp"
+            android:layout_height="19dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="25"
+            android:scaleType="fitXY"
             app:srcCompat="@drawable/ic_more_horiz_grey_16dp" />
 
     </LinearLayout>

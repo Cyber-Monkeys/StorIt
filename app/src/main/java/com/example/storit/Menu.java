@@ -156,16 +156,16 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(documentSnapshot.exists()){
                     String email = documentSnapshot.getString("Email");
-                    String name = documentSnapshot.getString("Name");
+                    String username = documentSnapshot.getString("Username");
                     String directory = documentSnapshot.getString("directory");
                     if(directory != null) {
                         fullDirectory = directory;
                     }
                     loadDirectory();
-                    if (name == null){
+                    if (username == null){
                         headerName.setText("Username");
                     }else{
-                        headerName.setText(name);
+                        headerName.setText(username);
                     }
 
                     headerEmail.setText(email);

@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,19 +22,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-public class AddCardPage extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+public class EditPaymentDetails extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     //Variables
     private static final String TAG = "-----------------------";
     Toolbar toolbar;
-    EditText creditName, creditNum, cvv;
-    Button addCard;
+    TextView cardNum;
+    EditText editCardName;
     Spinner monthSpinner, yearSpinner;
     private FirebaseFirestore db;
     CollectionReference userPayments;
@@ -46,7 +45,7 @@ public class AddCardPage extends AppCompatActivity implements AdapterView.OnItem
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_card_page);
+        setContentView(R.layout.activity_edit_payment_details);
 
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -54,13 +53,14 @@ public class AddCardPage extends AppCompatActivity implements AdapterView.OnItem
         if(firebaseUser != null){
             userId = firebaseUser.getUid();
             userPayments = db.collection("Users").document(userId).collection("Payments");
+            getDatabase();
         }
 
         //Toolbar for this page
         toolbar = findViewById(R.id.toolbar);
         TextView toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Add Card");
+        getSupportActionBar().setTitle("Edit Payment Details");
         toolbarTitle.setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -72,51 +72,15 @@ public class AddCardPage extends AppCompatActivity implements AdapterView.OnItem
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(AddCardPage.this, PaymentDetails.class));
+                startActivity(new Intent(EditPaymentDetails.this, PaymentDetails.class));
             }
         });
 
-        creditName = findViewById(R.id.editCreditName);
-        creditNum = findViewById(R.id.editCreditName);
-        cvv = findViewById(R.id.editCvv);
+        //initialize variables
+        cardNum = findViewById(R.id.cardNum);
+        editCardName = findViewById(R.id.editCreditName);
         monthSpinner = findViewById(R.id.monthSpinner);
         yearSpinner = findViewById(R.id.yearSpinner);
-        addCard = findViewById(R.id.button);
-
-        addCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String mName = creditName.getText().toString();
-                long mNum = Long.parseLong(creditNum.getText().toString());
-                int mCvv = Integer.parseInt(cvv.getText().toString());
-                int mMonth = Integer.parseInt(month);
-                int mYear = Integer.parseInt(year);
-
-                //store Classes in database
-                Map<String, Object> user = new HashMap<>();
-                user.put("Cardholder Name", mName);
-                user.put("Credit Number", mNum);
-                user.put("CVV", mCvv);
-                user.put("Month", mMonth);
-                user.put("Year", mYear);
-
-                //add item to database
-                userPayments.add(user).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "INSERTION OF DATA IS SUCCESS");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "INSERTION OF DATA IS FAILED");
-                    }
-                });
-
-                finish();
-                startActivity(new Intent(AddCardPage.this, PaymentDetails.class));
-            }
-        });
 
         //add spinner for month picker
         ArrayAdapter<CharSequence> monthAdapter = ArrayAdapter.createFromResource(this, R.array.months, android.R.layout.simple_spinner_item);
@@ -131,10 +95,34 @@ public class AddCardPage extends AppCompatActivity implements AdapterView.OnItem
 
     }
 
+    //Get card num from database
+    public void getDatabase(){
+        userPayments.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if(!queryDocumentSnapshots.isEmpty()){
+                    List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
+
+                    for(DocumentSnapshot d : list){
+
+                        String cardName = d.getString("Cardholder Name");
+                        int cardNumber = d.getDouble("Credit Number").intValue();
+                        editCardName.setText(cardName);
+                        cardNum.setText(Integer.toString(cardNumber));
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "INSERTION OF DATA IS SUCCESS");
+            }
+        });
+    }
+
     //When spinner is selected
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
         if (parent.getId() == R.id.monthSpinner){
             if (parent.getItemAtPosition(position).equals("Month")){
                 //do nothings
@@ -156,5 +144,4 @@ public class AddCardPage extends AppCompatActivity implements AdapterView.OnItem
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
-
 }

@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EditServer"></activity>
+        <activity android:name=".PurchasePlan"></activity>
+        <activity android:name=".EditPaymentDetails" />
+        <activity android:name=".EditServer" />
         <activity android:name=".ServerInformation" />
         <activity android:name=".AddCardPage" />
         <activity

@@ -11,9 +11,9 @@
 
         <Button
             android:id="@+id/button3"
-            android:layout_width="350dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Add a New Payment Method" />
+            android:text="Checkout" />
 
     </LinearLayout>
 

@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PaymentDetailsAdapter extends ArrayAdapter<CreditCard> {
+public class PurchasePlanAdapter extends ArrayAdapter<CreditCard> {
 
     //variables
     private Context mContext;
@@ -23,7 +23,7 @@ public class PaymentDetailsAdapter extends ArrayAdapter<CreditCard> {
     private final List<CreditCard> mItems = new ArrayList<CreditCard>();
 
     //Constructor
-    public PaymentDetailsAdapter(@NonNull Context context, int resource, @NonNull ArrayList<CreditCard> objects) {
+    public PurchasePlanAdapter(@NonNull Context context, int resource, @NonNull ArrayList<CreditCard> objects) {
 
         super(context, resource, objects);
         mContext = context;
@@ -50,25 +50,13 @@ public class PaymentDetailsAdapter extends ArrayAdapter<CreditCard> {
         TextView tvName = (TextView) convertView.findViewById(R.id.cardName);
         TextView tvCardNum = (TextView) convertView.findViewById(R.id.cardNum);
         TextView tvExpiryDate = (TextView) convertView.findViewById(R.id.expireDate);
-        Button editCard = convertView.findViewById(R.id.editCard);
 
         tvName.setText(cardName);
         tvCardNum.setText(""+cardNum);
         tvExpiryDate.setText(month + "/" + year);
 
-        editCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mContext.startActivity(new Intent(getContext(), EditPaymentDetails.class));
-            }
-        });
-
         return convertView;
 
     }
 
-    public void add(CreditCard item) {
-        mItems.add(item);
-        notifyDataSetChanged();
-    }
 }

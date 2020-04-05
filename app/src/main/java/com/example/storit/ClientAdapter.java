@@ -1,6 +1,7 @@
 package com.example.storit;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +65,12 @@ public class ClientAdapter extends BaseAdapter {
         moreOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //send data to more options fragment
+                Bundle bundle = new Bundle();
+                bundle.putString("fileFolderName", fileNameArr[position]); //send data to fragment
+                // set Arguments
                 MoreOptionsBottomSheetDialog bottomSheetDialog = new MoreOptionsBottomSheetDialog();
+                bottomSheetDialog.setArguments(bundle);
                 bottomSheetDialog.show(((FragmentActivity)context).getSupportFragmentManager(), "AddNewBottomSheet");
             }
         });

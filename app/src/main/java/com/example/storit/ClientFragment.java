@@ -22,9 +22,7 @@ public class ClientFragment extends Fragment {
     GridView gridView;
     TextView sortName;
 
-    private ArrayList<String> fileName = new ArrayList<String>();
-    static int fileImage = R.drawable.background_2;
-    private ArrayList<Integer> image = new ArrayList<Integer>();
+    private ArrayList<File> fileList = new ArrayList<File>();
     private ClientAdapter clientAdapter;
 
     @Nullable
@@ -40,7 +38,7 @@ public class ClientFragment extends Fragment {
         sortName = getView().findViewById(R.id.sortName);
         gridView = getView().findViewById(R.id.gridView);
 
-        clientAdapter = new ClientAdapter(getView().getContext(),fileName.toArray(new String[fileName.size()]), image.toArray(new Integer[image.size()]));
+        clientAdapter = new ClientAdapter(getView().getContext(),fileList);
         gridView.setAdapter(clientAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -48,7 +46,7 @@ public class ClientFragment extends Fragment {
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                                     long arg3) {
                 Log.d("Webrtcclient", "download request started");
-                ((Menu) getActivity()).downloadData(fileName.get(arg2));
+                ((Menu) getActivity()).downloadData(fileList.get(arg2).getFileId());
             }
 
         });
@@ -62,13 +60,13 @@ public class ClientFragment extends Fragment {
         });
 
     }
-    public void addFile(String name) {
-        fileName.add(name);
-        image.add(fileImage);
+    public void addFile(File addedFile) {
+        fileList.add(addedFile);
     }
     public void refreshAdapter() {
-        clientAdapter = new ClientAdapter(getView().getContext(), fileName.toArray(new String[fileName.size()]),image.toArray(new Integer[image.size()]));
-        gridView.setAdapter(clientAdapter);
+        clientAdapter.notifyDataSetChanged();
+//        clientAdapter = new ClientAdapter(getView().getContext(), fileList.toArray(new File[fileList.size()]),image.toArray(new Integer[image.size()]));
+//        gridView.setAdapter(clientAdapter);
 
     }
 

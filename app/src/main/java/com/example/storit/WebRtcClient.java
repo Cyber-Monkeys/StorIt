@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -50,7 +51,7 @@ public class WebRtcClient {
     private final static String TAG = WebRtcClient.class.getCanonicalName();
     // maximum number of peers
     private final static int MAX_PEER = 2;
-    private boolean[] endPoints = new boolean[MAX_PEER];
+//    private boolean[] endPoints = new boolean[MAX_PEER];
     // sounds like its similar to angular factory
     // which connected the events to data
     private PeerConnectionFactory factory;
@@ -62,6 +63,7 @@ public class WebRtcClient {
     // stores the peers
     private HashMap<String, Peer> peers = new HashMap<>();
     private HashMap<String, byte[]> downloadChunks = new HashMap<>();
+    private HashMap<String, Boolean> isDownloadComplete = new HashMap<>();
     private HashMap<String, Integer> downloadIndex = new HashMap<>();
     // stores all the servers
     private LinkedList<PeerConnection.IceServer> iceServers = new LinkedList<>();
@@ -77,7 +79,7 @@ public class WebRtcClient {
     TextView remoteText;
 
     boolean receivingFile;
-    boolean completedReceiving;
+    boolean completedReceiving = false;
     int incomingFileSize;
     int currentIndexPointer;
     byte[] imageFileBytes;
@@ -85,8 +87,12 @@ public class WebRtcClient {
     String requestType = "";
     Uri uri;
     int fileId;
-    ArrayList<Integer> fileSizes = new ArrayList<Integer>();
-    ArrayList<Integer> receivingFileSizes = new ArrayList<Integer>();
+    int fileSize = 0;
+    String fileType = "";
+    ChunkEncryption encryptor;
+    ArrayList<byte[]> imageFiles = new ArrayList<>();
+//    ArrayList<Integer> fileSizes = new ArrayList<Integer>();
+//    ArrayList<Integer> receivingFileSizes = new ArrayList<Integer>();
 
     @Nullable Intent data;
 
@@ -121,6 +127,8 @@ public class WebRtcClient {
     private class CreateAnswerCommand implements Command {
         public void execute(String peerId, JSONObject payload) throws JSONException {
             Peer peer = peers.get(peerId);
+            Log.d(TAG, "payload for " + peerId + " is ");
+            Log.d(TAG, payload.getString("sdp"));
             SessionDescription sdp = new SessionDescription(
                     SessionDescription.Type.fromCanonicalForm(payload.getString("type")),
                     payload.getString("sdp")
@@ -147,14 +155,16 @@ public class WebRtcClient {
     // add an ice server candidate
     private class AddIceCandidateCommand implements Command {
         public void execute(String peerId, JSONObject payload) throws JSONException {
-            PeerConnection pc = peers.get(peerId).pc;
-            if (pc.getRemoteDescription() != null) {
-                IceCandidate candidate = new IceCandidate(
-                        payload.getString("id"),
-                        payload.getInt("label"),
-                        payload.getString("candidate")
-                );
-                pc.addIceCandidate(candidate);
+            if(peers.containsKey(peerId)) {
+                PeerConnection pc = peers.get(peerId).pc;
+                if (pc.getRemoteDescription() != null) {
+                    IceCandidate candidate = new IceCandidate(
+                            payload.getString("id"),
+                            payload.getInt("label"),
+                            payload.getString("candidate")
+                    );
+                    pc.addIceCandidate(candidate);
+                }
             }
         }
     }
@@ -177,17 +187,30 @@ public class WebRtcClient {
         message.put("payload", payload);
         message.put("requestType", requestType);
         message.put("order", orderIndex);
+        Log.d(TAG, "the message being sent is of type " + type);
         client.emit("message", message);
     }
     public void uploadRequest(int orderIndex, DataChannel dc) {
         sendImage(chunks.get(orderIndex), dc);
         if(orderIndex == chunks.size() - 1) {
-            context.doneUploading();
+            context.doneUploading(fileId, fileSize, fileType);
         }
     }
     public void sendImage(byte[] file,  DataChannel dc) {
+        // encrypt chunk
+        try {
+            file = encryptor.encode(file);
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+            e.printStackTrace();
+        }
         int size = file.length;
+        this.fileSize = size;
         int numberOfChunks = size / CHUNK_SIZE;
+
+        ByteBuffer metaId = stringToByteBuffer("-f" + fileId, Charset.defaultCharset());
+        dc.send(new DataChannel.Buffer(metaId, false));
+
         ByteBuffer meta = stringToByteBuffer("-i" + size, Charset.defaultCharset());
         //WebRtcClient.localDataChannel.send(new DataChannel.Buffer(meta, false));
         dc.send(new DataChannel.Buffer(meta, false));
@@ -206,7 +229,7 @@ public class WebRtcClient {
     }
 
     public void downloadRequest(DataChannel dc) {
-        ByteBuffer meta = stringToByteBuffer("-d" , Charset.defaultCharset());
+        ByteBuffer meta = stringToByteBuffer("-d" + fileId , Charset.defaultCharset());
         //WebRtcClient.localDataChannel.send(new DataChannel.Buffer(meta, false));
         dc.send(new DataChannel.Buffer(meta, false));
     }
@@ -263,7 +286,7 @@ public class WebRtcClient {
         }
     }
     // receive message from socket
-    private void readIncomingMessageForClient(ByteBuffer buffer, DataChannel sendingChannel, String id) {
+    private void readIncomingMessageForClient(ByteBuffer buffer, DataChannel sendingChannel, String id, int orderIndex) {
         byte[] bytes;
         if (buffer.hasArray()) {
             bytes = buffer.array();
@@ -277,20 +300,30 @@ public class WebRtcClient {
 
             if (type.equals("-i")) {
                 peers.get(id).incomingFileSize = Integer.parseInt(firstMessage.substring(2, firstMessage.length()));
-                peers.get(id).imageFileBytes = new byte[peers.get(id).incomingFileSize];
+                try {
+                    downloadChunks.put(id, new byte[peers.get(id).incomingFileSize]);
+                    isDownloadComplete.put(id, false);
+                } catch(Exception e) {
+                    Log.d(TAG, "error " + e.getMessage());
+                }
+//                peers.get(id).imageFileBytes = new byte[peers.get(id).incomingFileSize];
                 Log.d(TAG, "readIncomingMessage: incoming file size " + peers.get(id).incomingFileSize);
                 peers.get(id).receivingFile = true;
             }
         } else {
             for (byte b : bytes) {
-                peers.get(id).imageFileBytes[peers.get(id).currentIndexPointer++] = b;
+                // if this still gives u an error
+                // try copying the byte array slowly
+                downloadChunks.get(id)[peers.get(id).currentIndexPointer++] = b;
             }
             if (peers.get(id).currentIndexPointer == peers.get(id).incomingFileSize) {
+                // save to files
                 Log.d(TAG, "readIncomingMessage: received all bytes");
-                Bitmap bmp = BitmapFactory.decodeByteArray(peers.get(id).imageFileBytes, 0, peers.get(id).imageFileBytes.length);
+//                Bitmap bmp = BitmapFactory.decodeByteArray(peers.get(id).imageFileBytes, 0, peers.get(id).imageFileBytes.length);
                 peers.get(id).receivingFile = false;
                 peers.get(id).currentIndexPointer = 0;
                 peers.get(id).completelyReceived = true;
+                isDownloadComplete.put(id, true);
 //                disconnect();
 //                context.runOnUiThread(new Runnable() {
 //                    @Override
@@ -298,14 +331,22 @@ public class WebRtcClient {
 //                        image.setImageBitmap(bmp);
 //                    }
 //                });
-                Iterator<String> itr = peers.keySet().iterator();
+
+                Iterator<String> itr = isDownloadComplete.keySet().iterator();
                 while (itr.hasNext()) {
-                    if(!peers.get(itr.next()).completelyReceived) {
+                    if(!isDownloadComplete.get(itr.next())) {
                         break;
                     } else if(!itr.hasNext()){
                         mergePhoto();
                         completedReceiving = true;
                     }
+                }
+
+                removePeer(id);
+                if(completedReceiving) {
+                    downloadChunks.clear();
+                    isDownloadComplete.clear();
+                    completedReceiving = false;
                 }
 //                removePeer(id);
 //
@@ -315,14 +356,25 @@ public class WebRtcClient {
         }
     }
     public void mergePhoto() {
+
         Bitmap[] bmpList = new Bitmap[2];
+
+        Log.d(TAG, "combining image of size" + bmpList.length);
         int i = 0;
-        for(String key: peers.keySet()) {
-            bmpList[i] = BitmapFactory.decodeByteArray(peers.get(key).imageFileBytes, 0, peers.get(key).imageFileBytes.length);
-            i++;
+        try {
+            for(String key:downloadChunks.keySet()) {
+                downloadChunks.put(key, encryptor.decode(downloadChunks.get(key)));
+                bmpList[i] = BitmapFactory.decodeByteArray(downloadChunks.get(key), 0, downloadChunks.get(key).length);
+                Log.d(TAG, "height of key " + key + " is " + bmpList[i].getHeight());
+                i++;
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "error in bitmap" + e.getMessage());
+            e.printStackTrace();
         }
         Bitmap combinedbmp = combineImages(bmpList[0], bmpList[1]);
-            context.runOnUiThread(new Runnable() {
+
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 context.showImage(combinedbmp);
@@ -333,14 +385,17 @@ public class WebRtcClient {
     public Bitmap combineImages(Bitmap c, Bitmap s) {
         Bitmap cs = null;
 
-        int width, height = 0;
-
-        if(c.getHeight() > s.getHeight()) {
-            height = c.getHeight() + s.getHeight();
-            width = c.getWidth();
-        } else {
-            height = s.getHeight() + s.getHeight();
-            width = c.getWidth();
+        int width = 0, height = 0;
+        try {
+            if (c.getHeight() > s.getHeight()) {
+                height = c.getHeight() + s.getHeight();
+                width = c.getWidth();
+            } else {
+                height = s.getHeight() + s.getHeight();
+                width = c.getWidth();
+            }
+        } catch(Exception e) {
+            Log.d(TAG, "combining error: " + e.getMessage());
         }
 
         cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -380,23 +435,13 @@ public class WebRtcClient {
                     String type = data.getString("type");
                     String requestType = data.getString("requestType");
                     int orderIndex = data.getInt("order");
-                    Log.d(TAG, "the type of message received is " + type);
+                    Log.d(TAG, "the type of message received is " + type + " from " + from);
+
                     JSONObject payload = null;
                     if (!type.equals("init")) {
                         payload = data.getJSONObject("payload");
                     }
-                    // if peer is unknown, try to add him
-                    if (!peers.containsKey(from)) {
-                        // if MAX_PEER is reach, ignore the call
-                        int endPoint = findEndPoint();
-                        if (endPoint != MAX_PEER) {
-                            Peer peer = addPeer(from, endPoint, requestType, orderIndex);
-                            //peer.pc.addStream(localMS);
-                            commandMap.get(type).execute(from, payload);
-                        }
-                    } else {
-                        commandMap.get(type).execute(from, payload);
-                    }
+                    commandMap.get(type).execute(from, payload);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -450,7 +495,8 @@ public class WebRtcClient {
                         JSONObject socketObj = (JSONObject) socketList.get(i);
                         String socketId = socketObj.getString("socketId");
                         Log.d("STORIT---", "the socket id is " + socketId);
-                        sendMessage(socketId, "init", null, requestType, i);
+                        sendMessage(socketId, "init", null, "serverUpload", i);
+                        addPeer(socketId, "serverUpload", i);
                     }
                     // lsn u got to update firebase with file id
                 } catch (JSONException e) {
@@ -471,7 +517,8 @@ public class WebRtcClient {
                         JSONObject socketObj = (JSONObject) socketList.get(i);
                         String socketId = socketObj.getString("socketId");
                         Log.d("STORIT---", "the socket id is " + socketId);
-                        sendMessage(socketId, "init", null, requestType, i);
+                        sendMessage(socketId, "init", null, "serverDownload", i);
+                        addPeer(socketId, "serverDownload", i);
                     }
                     // lsn u got to update firebase with file id
                 } catch (JSONException e) {
@@ -569,9 +616,8 @@ public class WebRtcClient {
         byte[] imageFileBytes;
         int currentIndexPointer;
         int incomingFileSize;
-        boolean completelyReceived;
+        boolean completelyReceived = false;
         private int orderIndex;
-        private int endPoint;
         DataChannel localDataChannel;
         DataChannel remoteDataChannel;
 
@@ -587,12 +633,12 @@ public class WebRtcClient {
                 payload.put("type", sdp.type.canonicalForm());
                 payload.put("sdp", sdp.description);
                 sendMessage(id, sdp.type.canonicalForm(), payload, requestType, orderIndex);
-
                 pc.setLocalDescription(Peer.this, sdp);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
 
         @Override
         public void onSetSuccess() {
@@ -608,12 +654,23 @@ public class WebRtcClient {
 
         @Override
         public void onSignalingChange(PeerConnection.SignalingState signalingState) {
+//            if(signalingState == PeerConnection.SignalingState.CLOSED) {
+//                Log.d(TAG, "SIGNALLING STATE IS CLOSED");
+//            }
+//            if(signalingState == PeerConnection.SignalingState.CLOSED && requestType.equals("serverUpload")) {
+//                Log.d(TAG,"disconnecting peer");
+//                removeDisconnectedPeer(id);
+//            }
         }
 
         @Override
         public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
-            if (iceConnectionState == PeerConnection.IceConnectionState.DISCONNECTED) {
-                removePeer(id);
+//            if(iceConnectionState == PeerConnection.IceConnectionState.DISCONNECTED) {
+//
+//            }
+            if (iceConnectionState == PeerConnection.IceConnectionState.DISCONNECTED && requestType.equals("serverUpload")) {
+                Log.d(TAG,"disconnecting peer");
+                removeDisconnectedPeer(id);
             }
         }
 
@@ -645,7 +702,7 @@ public class WebRtcClient {
         @Override
         public void onRemoveStream(MediaStream mediaStream) {
             Log.d(TAG, "onRemoveStream " + mediaStream.label());
-            removePeer(id);
+//            removePeer(id);
         }
 
         // receiving datachannel
@@ -672,7 +729,7 @@ public class WebRtcClient {
                     if(type.equals("server")) {
                         readIncomingMessage(buffer.data, localDataChannel, id);
                     } else if(type.equals("client")) {
-                        readIncomingMessageForClient(buffer.data, localDataChannel, id);
+                        readIncomingMessageForClient(buffer.data, localDataChannel, id, orderIndex);
                     }
                 }
             });
@@ -686,15 +743,13 @@ public class WebRtcClient {
         }
         // constructor
         // create a new connection using a factory
-        public Peer(String id, int endPoint, String requestType, int orderIndex) {
-            Log.d(TAG, "new Peer: " + id + " " + endPoint);
+        public Peer(String id, String requestType, int orderIndex) {
+//            Log.d(TAG, "new Peer: " + id + " " + endPoint);
             this.pc = factory.createPeerConnection(iceServers, pcConstraints, this);
             this.id = id;
             this.orderIndex = orderIndex;
             this.requestType = requestType;
-            this.endPoint = endPoint;
             localDataChannel = this.pc.createDataChannel("sendDataChannel", new DataChannel.Init());
-
             localDataChannel.registerObserver(new DataChannel.Observer() {
                 // if the state changes
                 @Override
@@ -728,7 +783,7 @@ public class WebRtcClient {
 
                 @Override
                 public void onMessage(DataChannel.Buffer buffer) {
-                    readIncomingMessage(buffer.data, localDataChannel, id);
+//                    readIncomingMessage(buffer.data, localDataChannel, id);
                 }
             });
 //            Log.d(TAG, "DATA channel size is " + dataChannelArrayList.size());
@@ -763,23 +818,31 @@ public class WebRtcClient {
 //            Log.d(TAG, "DataChannel: onStateChange: " + dataChannel.state());
 //        }
 //    }
-    private Peer addPeer(String id, int endPoint, String type, int orderIndex) {
-        Peer peer = new Peer(id, endPoint, type, orderIndex);
+    private Peer addPeer(String id, String type, int orderIndex) {
+        Peer peer = new Peer(id, type, orderIndex);
         peers.put(id, peer);
-
-        endPoints[endPoint] = true;
+        isDownloadComplete.put(id, false);
+//        endPoints[endPoint] = true;
         return peer;
     }
 
     private void removePeer(String id) {
+        Log.d(TAG, "removing peer with id " + id);
         Peer peer = peers.get(id);
-        if(peer.localDataChannel.state() != DataChannel.State.CLOSED)
-            peer.localDataChannel.close();
-        if(peer.remoteDataChannel.state() != DataChannel.State.CLOSED)
-            peer.remoteDataChannel.close();
         peer.pc.close();
+//        peer.pc.dispose();
+//        peer.disconnectPeer();
+//        if(peer.localDataChannel.state() != DataChannel.State.CLOSED)
+//            peer.localDataChannel.close();
+//        if(peer.remoteDataChannel.state() != DataChannel.State.CLOSED)
+//            peer.remoteDataChannel.close();
+//        peer.pc.close();
         peers.remove(peer.id);
-        endPoints[peer.endPoint] = false;
+//        endPoints[peer.endPoint] = false;
+    }
+    private void removeDisconnectedPeer(String id) {
+        peers.get(id).pc.close();
+        peers.remove(id);
     }
     // constructor
     public WebRtcClient(String host, Menu _context, String type) {
@@ -788,6 +851,7 @@ public class WebRtcClient {
         PeerConnectionFactory.initializeAndroidGlobals(_context, true, true, false, null);
         factory = new PeerConnectionFactory();
         MessageHandler messageHandler = new MessageHandler();
+        encryptor = new ChunkEncryption(context);
 
         try {
             Log.d(TAG, "made it to sockets");
@@ -832,10 +896,16 @@ public class WebRtcClient {
         }
         client.emit("addserver", message);
     }
+    // emit upload request
+    // to get socket ids
     public void emitUpload(String token,String requestType,  @Nullable Intent data) {
         this.data = data;
         this.requestType = requestType;
         uri = data.getData();
+        String path = uri.getPath();
+        if(path.lastIndexOf(".") != -1) {
+            this.fileType = path.substring(path.lastIndexOf("."));
+        }
         File f = new File(uri.getPath());
         long size = f.length();
         JSONObject message = new JSONObject();
@@ -848,9 +918,10 @@ public class WebRtcClient {
         }
         client.emit("upload", message);
     }
-    public void emitDownload(String token, String requestType, String fileName) {
+    public void emitDownload(String token, String requestType, int fileId) {
         Log.d(TAG, "download emitted");
         this.requestType = requestType;
+        this.fileId = fileId;
         JSONObject message = new JSONObject();
 
         try {
@@ -878,10 +949,10 @@ public class WebRtcClient {
     }
 
 
-    private int findEndPoint() {
-        for (int i = 0; i < MAX_PEER; i++) if (!endPoints[i]) return i;
-        return MAX_PEER;
-    }
+//    private int findEndPoint() {
+//        for (int i = 0; i < MAX_PEER; i++) if (!endPoints[i]) return i;
+//        return MAX_PEER;
+//    }
 
 
 }

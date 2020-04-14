@@ -156,6 +156,12 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 startActivity(new Intent(Menu.this, Profile.class));
             }
         });
+        headerImage.setOnClickListener(new View.OnClickListener() { // go to profile class
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Menu.this, Profile.class));
+            }
+        });
         //Setting header email and username from database
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override

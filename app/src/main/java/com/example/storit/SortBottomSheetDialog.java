@@ -1,5 +1,6 @@
 package com.example.storit;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,4 +19,5 @@ public class SortBottomSheetDialog extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.bottom_sheet_sort, container, false);
         return view;
     }
+
 }

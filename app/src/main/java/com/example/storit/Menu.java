@@ -55,6 +55,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -148,6 +149,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 }
             }
         };
+        createProfileInfo(); //check if profile info does not exist
 
         //header of nav drawer
         hView.setOnClickListener(new View.OnClickListener() {
@@ -596,4 +598,40 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         //return
         return deviceId;
     }
+
+    public void createProfileInfo(){
+        documentReference = db.collection("Users").document(userId);
+        //Setting attributes from database
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(!documentSnapshot.exists()){
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("Email", mFirebaseAuth.getCurrentUser().getEmail());
+                    user.put("Username", " ");
+                    user.put("Name", " ");
+                    Date date = new Date(); //set date to null
+                    user.put("Birthdate", date);
+                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "user profile created");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure" + e.getMessage());
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "FAILURE " + e.getMessage());
+            }
+        });
+
+    }
+
 }

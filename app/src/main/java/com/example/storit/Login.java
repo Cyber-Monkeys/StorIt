@@ -243,8 +243,8 @@ public class Login extends AppCompatActivity {
                             documentReference = db.collection("Users").document(userId);
                             final Map<String, Object> user = new HashMap<>();
                             user.put("Email", mFirebaseAuth.getCurrentUser().getEmail());
-                            user.put("Username", "");
-                            user.put("Name", "");
+                            user.put("Username", " ");
+                            user.put("Name", " ");
                             Date date = new Date(); //set date to null
                             user.put("Birthdate", date);
 

@@ -85,7 +85,7 @@
                     android:layout_gravity="center_horizontal"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:text="What is StorIT?"/>
+                    android:text="What are the advantages of StorIT?"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -108,7 +108,7 @@
                     android:layout_gravity="center_horizontal"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:text="What is StorIT?"/>
+                    android:text="Is StorIT only available for mobile devices?"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -131,7 +131,7 @@
                     android:layout_gravity="center_horizontal"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:text="What is StorIT?"/>
+                    android:text="How to upload a file?"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -154,7 +154,7 @@
                     android:layout_gravity="center_horizontal"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:text="What is StorIT?"/>
+                    android:text="How to create a folder?"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -177,7 +177,7 @@
                     android:layout_gravity="center_horizontal"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:text="What is StorIT?"/>
+                    android:text="How to search a file or folder?"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -200,7 +200,7 @@
                     android:layout_gravity="center_horizontal"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:text="What is StorIT?"/>
+                    android:text="How to add a server?"/>
 
                 <TextView
                     android:layout_width="match_parent"

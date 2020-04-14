@@ -10,6 +10,14 @@ public class File {
     ArrayList<File> children;
 
     int fileImage = R.drawable.background_2;
+    public File(String fileName, boolean isFolder) {
+        this.fileName = fileName;
+        if(!isFolder) {
+            fileImage = R.drawable.background_2;
+        } else {
+            fileImage = R.drawable.ic_folder_black_24dp;
+        }
+    }
     public File(int fileId, int fileSize, String fileName, String fileType, boolean isFolder) {
         this.fileId = fileId;
         this.fileSize = fileSize;

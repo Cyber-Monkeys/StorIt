@@ -2,6 +2,7 @@ package com.example.storit;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -9,22 +10,32 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.util.FileUtil;
 
 import java.io.BufferedInputStream;
@@ -35,14 +46,23 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
 
     //variables
+    private static final String TAG = "AndroidClarified ----";
+    DocumentReference documentReference;
+    private FirebaseFirestore db;
+    FirebaseUser firebaseUser;
+    FirebaseAuth mFirebaseAuth;
+    String userId;
     ImageView addFolder, addSecureUpload, addUpload;
     private static final int REQUEST_CODE = 11;
     WebRtcClient client;
+    private ClientFragment clientFragment = new ClientFragment();
 
     @Nullable
     @Override
@@ -55,6 +75,10 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        db = FirebaseFirestore.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = mFirebaseAuth.getCurrentUser();
+        userId = firebaseUser.getUid();
         addFolder = (ImageView) getView().findViewById(R.id.circular_folder);
         addSecureUpload = (ImageView) getView().findViewById(R.id.circular_secure_upload);
         addUpload = (ImageView) getView().findViewById(R.id.circular_upload);
@@ -62,7 +86,8 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
         addFolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "FOLDER", Toast.LENGTH_SHORT).show();
+
+                showAddFolderDialog(); //display create folder dialog
             }
         });
 
@@ -156,7 +181,87 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
         }
         return result;
     }
-}
+
+    //set dialog add folder
+    private void showAddFolderDialog(){
+        //AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Create a New Folder");
+
+        //set linear layout
+        LinearLayout linearLayout = new LinearLayout(getContext());
+        linearLayout.setFocusableInTouchMode(true);
+
+        //views to set in dialog
+
+        final EditText mFolderText = new EditText(getContext());
+        mFolderText.setHint("Folder Name");
+        mFolderText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        mFolderText.setMinEms(10);
+
+        linearLayout.addView(mFolderText);
+        linearLayout.setPadding(50,10,10,10);
+
+        builder.setView(linearLayout);
+
+        //buttons
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //when you create a folder, set a field "dir"
+                String folderName = mFolderText.getText().toString().trim();
+                String currentDocumentPath = clientFragment.getCurrentDocumentPath();
+                String newDocumentPath = currentDocumentPath + "/" + folderName + "/" + userId;
+                documentReference = db.document(newDocumentPath);
+                Map<String, Object> user = new HashMap<>();
+                user.put("dir", ",");
+
+                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Folder added" );
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure" + e.getMessage());
+                    }
+                });
+
+                documentReference = db.document(currentDocumentPath);
+                //add folderName to dir string of current directory
+                String updatedFullDirectory = clientFragment.getFullDirectory() + "," + folderName;
+
+                 documentReference.update("dir", updatedFullDirectory).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Directory updated" );
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure" + e.getMessage());
+                    }
+                });
+                AddNewBottomSheetDialog.this.dismiss(); //close dialog
+                getActivity().finish(); //refresh
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Cancel dialog
+                dialog.dismiss();
+            }
+        });
+
+        //show dialog
+        builder.create().show();
+
+    }
+} // end of main class
 
 
 

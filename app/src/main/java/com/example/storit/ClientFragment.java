@@ -201,6 +201,22 @@ public class ClientFragment extends Fragment {
                     loadDirectory();
                 } else{
                     Toast.makeText(getContext(), "not exists", Toast.LENGTH_SHORT).show();
+                    documentReference = db.document(documentPath);
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("dir", ",");
+
+                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "dir created" );
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure" + e.getMessage());
+                        }
+                    });
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {

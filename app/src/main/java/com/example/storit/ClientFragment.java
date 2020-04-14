@@ -1,6 +1,5 @@
 package com.example.storit;
 
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,8 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -32,6 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,17 +49,17 @@ public class ClientFragment extends Fragment {
     String userReference, testDir;
     GridView gridView;
     TextView sortName;
-    DocumentReference documentReference;
-    private FirebaseFirestore db;
-    FirebaseUser firebaseUser;
+    FirebaseFirestore db;
     FirebaseAuth mFirebaseAuth;
+    FirebaseUser firebaseUser;
     String userId;
-    private ArrayList<String> fileName = new ArrayList<String>();
-    private ArrayList<String> tempFileName = new ArrayList<String>();
-    static int fileImage = R.drawable.file_transparent2;
-    static int folderImage = R.drawable.folder_transparent2;
-    private ArrayList<Integer> image = new ArrayList<Integer>();
-    public ClientAdapter clientAdapter;
+    DocumentReference documentReference;
+//    ArrayList<File> tempFileName;
+
+
+
+    private ArrayList<File> fileList = new ArrayList<File>();
+    private ClientAdapter clientAdapter;
 
     @Nullable
     @Override
@@ -106,7 +108,7 @@ public class ClientFragment extends Fragment {
             }
         });
 
-        clientAdapter = new ClientAdapter(getView().getContext(),fileName.toArray(new String[fileName.size()]), image.toArray(new Integer[image.size()]));
+        clientAdapter = new ClientAdapter(getView().getContext(),fileList);
         gridView.setAdapter(clientAdapter);
         loadCurrentDirOfDevice(); //load data to collection view
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -114,13 +116,15 @@ public class ClientFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                                     long arg3) {
-                if (fileName.get(arg2).contains("Folder")){ //arg2 is position
-                    documentPath += "/" + fileName.get(arg2) + "/" + userId;
+                Log.d("Webrtcclient", "download request started");
+                ((Menu) getActivity()).downloadData(fileList.get(arg2).getFileId());
+                if (fileList.get(arg2).getFileName().contains("Folder")){ //arg2 is position
+                    documentPath += "/" + fileList.get(arg2).getFileName() + "/" + userId;
                     updateCurrentDirOfDevice(documentPath); //update dir to firebase
                     loadCurrentDirectory();
                 } else {
                     Log.d("Webrtcclient", "download request started");
-                    ((Menu) getActivity()).downloadData(fileName.get(arg2));
+                    ((Menu) getActivity()).downloadData(fileList.get(arg2).getFileId());
                 } // else statement end line
 
             }
@@ -143,38 +147,34 @@ public class ClientFragment extends Fragment {
             }
         });
 
-        testingFunction();
-        getDataTesting();
+//        testingFunction();
+//        getDataTesting();
 
     }
-    //add file to an array
-    //check if file or folder and add image
-    public void addFile(String name) {
-        fileName.add(name);
-        if (name.contains("Folder")){
-            image.add(folderImage);
-        } else {
-            image.add(fileImage);
-        }
+    public void addFile(File addedFile) {
+        fileList.add(addedFile);
     }
     public void refreshAdapter() {
-        clientAdapter = new ClientAdapter(getView().getContext(), fileName.toArray(new String[fileName.size()]),image.toArray(new Integer[image.size()]));
-        gridView.setAdapter(clientAdapter);
+        clientAdapter.notifyDataSetChanged();
+//        clientAdapter = new ClientAdapter(getView().getContext(), fileList.toArray(new File[fileList.size()]),image.toArray(new Integer[image.size()]));
+//        gridView.setAdapter(clientAdapter);
 
     }
 
     public void loadDirectory() {
-        fileName.clear(); image.clear();
+        fileList.clear();
         String[] files = fullDirectory.split(",");
         for (int i = 1; i < files.length; i++) {
-            fileName.add(files[i]);
+//            fileName.add(files[i]);
             if (files[i].contains("Folder")){
-                image.add(folderImage);
+                fileList.add(new File(files[i],true));
+//                image.add(folderImage);
             } else {
-                image.add(fileImage);
+                fileList.add(new File(files[i],false));
+//                image.add(fileImage);
             }
         }
-        tempFileName = (ArrayList<String>) fileName.clone(); //get a copy of it
+//        tempFileName = (ArrayList<String>) fileList.clone(); //get a copy of it
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -224,15 +224,8 @@ public class ClientFragment extends Fragment {
         }
         updateCurrentDirOfDevice(documentPath); //update dir to firebase
     } // end of removeCurrentDirectory
-
     private void searchFileFolder(String fileFolderName){ //searching files or folders
-        for (String fileFolder : tempFileName){
-            if (!fileFolder.toLowerCase().contains(fileFolderName.toLowerCase())) {
-                fileName.remove(fileFolder);
-                image.remove(fileFolder);
-            }
-        }
-
+        fileList.removeIf(f -> !f.getFileName().toLowerCase().contains(fileFolderName.toLowerCase()));
         refreshAdapter();
     } //end of searchFileFolder
 
@@ -291,50 +284,50 @@ public class ClientFragment extends Fragment {
         });
     }
     //test
-    private void testingFunction(){
-        File file = new File("ddasd.txt", "text");
-        File file2 = new File("ddasd.txt", "folder");
-        ArrayList<File> arrFile = new ArrayList<>();
-        arrFile.add(file); arrFile.add(file2);
-
-        Map<String, Object> docData = new HashMap<>();
-        docData.put("testingFile", arrFile);
-        documentReference = db.document(testDir);
-        documentReference.set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Directory updated" );
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure" + e.getMessage());
-            }
-        });
-    }
-    //test
-    private void getDataTesting(){
-        documentReference = db.document(testDir);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-                    List<Map<String, Object>> users = (List<Map<String, Object>>) documentSnapshot.get("testingFile");
-                    Log.d(TAG, users.get(0).toString() + " " + users.get(1).toString() + " " + users.size());
-                    for(int i = 0; i < users.size(); i++){
-                        String name = users.get(i).get("name").toString();
-                        String type = users.get(i).get("type").toString();
-                        Log.d(TAG, name + " " + type);
-                    }
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "FAILURE " + e.getMessage());
-            }
-        });
-    }
+//    private void testingFunction(){
+//        File file = new File("ddasd.txt", "text");
+//        File file2 = new File("ddasd.txt", "folder");
+//        ArrayList<File> arrFile = new ArrayList<>();
+//        arrFile.add(file); arrFile.add(file2);
+//
+//        Map<String, Object> docData = new HashMap<>();
+//        docData.put("testingFile", arrFile);
+//        documentReference = db.document(testDir);
+//        documentReference.set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//            @Override
+//            public void onSuccess(Void aVoid) {
+//                Log.d(TAG, "Directory updated" );
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.d(TAG, "onFailure" + e.getMessage());
+//            }
+//        });
+//    }
+//    //test
+//    private void getDataTesting(){
+//        documentReference = db.document(testDir);
+//        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                if(documentSnapshot.exists()){
+//                    List<Map<String, Object>> users = (List<Map<String, Object>>) documentSnapshot.get("testingFile");
+//                    Log.d(TAG, users.get(0).toString() + " " + users.get(1).toString() + " " + users.size());
+//                    for(int i = 0; i < users.size(); i++){
+//                        String name = users.get(i).get("name").toString();
+//                        String type = users.get(i).get("type").toString();
+//                        Log.d(TAG, name + " " + type);
+//                    }
+//                }
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.d(TAG, "FAILURE " + e.getMessage());
+//            }
+//        });
+//    }
     //getters
     public String getCurrentDocumentPath(){
         return documentPath;

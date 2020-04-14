@@ -9,6 +9,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -52,6 +56,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -86,7 +91,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     TextView seekBarText;
     SeekBar setSeekbar;
 
-    WebRtcClient server = null;
+
     WebRtcClient client = null;
     static  String deviceId;
     ClientFragment clientFragment;
@@ -94,6 +99,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     String fileUploading = "";
     AddNewBottomSheetDialog bottomSheetDialog;
     View layout;
+    Handler myHandler;
 
 
     static String sharedPrefDbName = "STORITDB";
@@ -213,6 +219,13 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
+        myHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                Bitmap bmp = (Bitmap) msg.obj;
+                showImage(bmp);
+            }
+        };
         //Set fragment to client first
         index = CLIENT;
         clientFragment = new ClientFragment();
@@ -240,7 +253,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         bottomSheetDialog.dismiss();
         this.fileUploading = fileName;
     }
-    public  void downloadData(final String fileName) {
+    public  void downloadData(int fileId) {
         final Context context = this;
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         String uniqueID = UUID.randomUUID().toString();
@@ -252,7 +265,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                             Log.d("webrtcclient", "token verified and request begins");
                             if(client == null)
                                 client = new WebRtcClient("https://www.vrpacman.com", (Menu) context, "client");
-                            client.emitDownload(idToken,"serverDownload", fileName);
+                            client.emitDownload(idToken,"serverDownload", fileId);
 
                         } else {
                             // Handle error -> task.getException();
@@ -272,7 +285,8 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     public void loadDirectory() {
         String[] files = fullDirectory.split(",");
         for (int i = 1; i < files.length; i++) {
-            this.clientFragment.addFile(files[i]);
+            File f = new File(0, 0, files[i], ".txt", false);
+            this.clientFragment.addFile(f);
         }
         this.runOnUiThread(new Runnable() {
             @Override
@@ -281,20 +295,24 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
     }
-    public void addFile(String fileUploadedName) {
-        this.clientFragment.addFile(fileUploadedName);
+    public void addFile(File addedFile) {
+        Log.d(TAG, "adding new file");
+        this.clientFragment.addFile(addedFile);
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+//                clientFragment.addFile(addedFile);
                 clientFragment.refreshAdapter();
             }
         });
     }
-    public void doneUploading() {
-        if(!fileUploading.equals("")) {
-            addFile(fileUploading);
-//            loadDirectory(fileUploading);
-        }
+    public void doneUploading(int fileId, int fileSize, String fileType) {
+        File addedFile = new File(fileId, fileSize, fileUploading, fileType, false);
+        addFile(addedFile);
+//        if(!fileUploading.equals("")) {
+//            addFile(addedFile);
+////            loadDirectory(fileUploading);
+//        }
     }
 
     //navigation drawer
@@ -504,26 +522,41 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         final Context context = this;
         final String uniqueID = getDeviceId();
+        if(!isServiceRunning("com.example.storit.ServerService")) {
+            serverFragment.addNewServer();
+            // start service
+            Intent intent = new Intent(this, ServerService.class);
+            intent.putExtra("storageSize", storageSize);
+            intent.putExtra("devId", uniqueID);
 
-        mUser.getIdToken(true)
-                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                    public void onComplete(@NonNull Task<GetTokenResult> task) {
-                        if (task.isSuccessful()) {
-                            String idToken = task.getResult().getToken();
-                            if(server == null) {
-                                serverFragment.addNewServer();
-                                server = new WebRtcClient("https://www.vrpacman.com/", (Menu) context, "server");
-                            }
-
-                            server.emitServer(idToken, storageSize, uniqueID);
-                        } else {
-                            // Handle error -> task.getException();
-                            Log.d("res3", "no token verified");
-                        }
-                    }
-                });
+            startService(intent);
+        } else {
+            // stop service
+            Intent intent = new Intent(this, ServerService.class);
+            stopService(intent);
+        }
 
         dialog.dismiss();
+    }
+    private boolean isServiceRunning(String serviceName){
+        boolean serviceRunning = false;
+        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> l = am.getRunningServices(50);
+        Iterator<ActivityManager.RunningServiceInfo> i = l.iterator();
+        while (i.hasNext()) {
+            ActivityManager.RunningServiceInfo runningServiceInfo = i
+                    .next();
+            Log.d(TAG, runningServiceInfo.service.getClassName());
+            if(runningServiceInfo.service.getClassName().equals(serviceName)){
+                serviceRunning = true;
+
+                if(runningServiceInfo.foreground)
+                {
+                    //service run in foreground
+                }
+            }
+        }
+        return serviceRunning;
     }
     public String getDeviceId() {
         //if the deviceId is not null, return it

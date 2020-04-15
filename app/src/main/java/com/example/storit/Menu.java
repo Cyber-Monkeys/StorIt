@@ -599,7 +599,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         return deviceId;
     }
 
-    public void createProfileInfo(){
+    public void createProfileInfo(){ //if user profile does not exist (for gmail users)
         documentReference = db.collection("Users").document(userId);
         //Setting attributes from database
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -608,8 +608,8 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 if(!documentSnapshot.exists()){
                     Map<String, Object> user = new HashMap<>();
                     user.put("Email", mFirebaseAuth.getCurrentUser().getEmail());
-                    user.put("Username", " ");
-                    user.put("Name", " ");
+                    user.put("Username", mFirebaseAuth.getCurrentUser().getDisplayName());
+                    user.put("Name", mFirebaseAuth.getCurrentUser().getDisplayName());
                     Date date = new Date(); //set date to null
                     user.put("Birthdate", date);
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -622,6 +622,30 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                         public void onFailure(@NonNull Exception e) {
                             Log.d(TAG, "onFailure" + e.getMessage());
                         }
+                    }).addOnCompleteListener(new OnCompleteListener<Void>() { // once completed update nav bar header
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    if(documentSnapshot.exists()){
+                                        String email = documentSnapshot.getString("Email");
+                                        String username = documentSnapshot.getString("Username");
+                                        if (username == null){
+                                            headerName.setText("Username");
+                                        }else{
+                                            headerName.setText(username);
+                                        }
+                                        headerEmail.setText(email);
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "FAILURE " + e.getMessage());
+                                }
+                            });
+                        }
                     });
                 }
             }
@@ -631,7 +655,5 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 Log.d(TAG, "FAILURE " + e.getMessage());
             }
         });
-
     }
-
 }

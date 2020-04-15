@@ -245,7 +245,9 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                     }
                 });
                 AddNewBottomSheetDialog.this.dismiss(); //close dialog
-                getActivity().finish(); //refresh
+                getActivity().finish();
+                getActivity().overridePendingTransition(0, 0);
+                //getActivity().finish(); //refresh
             }
         });
 

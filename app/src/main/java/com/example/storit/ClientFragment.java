@@ -351,4 +351,5 @@ public class ClientFragment extends Fragment {
     public String getFullDirectory(){
         return fullDirectory;
     }
+
 }

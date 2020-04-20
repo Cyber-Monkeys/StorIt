@@ -62,8 +62,7 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     private static final int REQUEST_CODE = 11;
     WebRtcClient client;
     private ClientFragment clientFragment = new ClientFragment();
-    //private ArrayList<com.example.storit.File> fileList = new ArrayList<File>();
-    private ClientAdapter clientAdapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

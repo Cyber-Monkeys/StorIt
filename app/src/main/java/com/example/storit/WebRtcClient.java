@@ -344,6 +344,9 @@ public class WebRtcClient {
 
                 removePeer(id);
                 if(completedReceiving) {
+//                    for(String key : peers.keySet()) {
+//                        removePeer(peers.get(key).id);
+//                    }
                     downloadChunks.clear();
                     isDownloadComplete.clear();
                     completedReceiving = false;
@@ -441,7 +444,9 @@ public class WebRtcClient {
                     if (!type.equals("init")) {
                         payload = data.getJSONObject("payload");
                     }
-                    commandMap.get(type).execute(from, payload);
+                    if(peers.containsKey(from)) {
+                        commandMap.get(type).execute(from, payload);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -756,10 +761,10 @@ public class WebRtcClient {
                 public void onStateChange() {
                     if(localDataChannel.state() == DataChannel.State.OPEN) {
                         if(requestType.equals("serverUpload") && type.equals("client")) {
-                            Log.d(TAG, "send image is called");
+                            Log.d(TAG, "send image is called for upload");
                             uploadRequest(orderIndex, localDataChannel);
                         } else if(requestType.equals("serverDownload") && type.equals("client")) {
-                            Log.d(TAG, "send image is called");
+                            Log.d(TAG, "send image is called for download");
                             downloadRequest(localDataChannel);
                         }
                     }

@@ -314,6 +314,17 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
     }
+    public void removeFileFolder(String file) {
+        Log.d(TAG, "adding new file");
+        this.clientFragment.removeFile(file);
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+//                clientFragment.addFile(addedFile);
+                clientFragment.refreshAdapter();
+            }
+        });
+    }
     public void doneUploading(int fileId, int fileSize, String fileType) {
         File addedFile = new File(fileId, fileSize, fileUploading, fileType, false);
         addFile(addedFile);

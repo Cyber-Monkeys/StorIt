@@ -153,6 +153,27 @@ public class ClientFragment extends Fragment {
     }
     public void addFile(File addedFile) {
         fileList.add(addedFile);
+//
+//        String currentDocumentPath = getCurrentDocumentPath();
+//        documentReference = db.document(currentDocumentPath);
+//        //add folderName to dir string of current directory
+//        String updatedFullDirectory = getFullDirectory() + "," + addedFile.getFileName();
+//
+//        documentReference.update("dir", updatedFullDirectory).addOnSuccessListener(new OnSuccessListener<Void>() {
+//            @Override
+//            public void onSuccess(Void aVoid) {
+//                Log.d(TAG, "Directory updated" );
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.d(TAG, "onFailure" + e.getMessage());
+//            }
+//        });
+        //updateCurrentDirOfDevice(documentPath);
+    }
+    public void removeFile(String removeFile) {
+        fileList.removeIf(file -> (removeFile == file.getFileName()));
     }
     public void refreshAdapter() {
         clientAdapter.notifyDataSetChanged();

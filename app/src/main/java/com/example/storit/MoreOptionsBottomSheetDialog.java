@@ -123,9 +123,10 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
             public void onClick(View v) {
                 //Toast.makeText(getContext(), "remove Button", Toast.LENGTH_SHORT).show();
                 removeFileFolder();
+                ((Menu)getActivity()).removeFileFolder(strFileFolderName);
                 MoreOptionsBottomSheetDialog.this.dismiss(); //close dialog
-                getActivity().finish(); //refresh
-                getActivity().overridePendingTransition(0, 0); //remove blink animation
+//                getActivity().finish(); //refresh
+//                getActivity().overridePendingTransition(0, 0); //remove blink animation
             }
         });
 

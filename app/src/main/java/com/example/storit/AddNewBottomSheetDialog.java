@@ -40,7 +40,6 @@ import com.google.firebase.firestore.util.FileUtil;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -63,7 +62,8 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     private static final int REQUEST_CODE = 11;
     WebRtcClient client;
     private ClientFragment clientFragment = new ClientFragment();
-
+    //private ArrayList<com.example.storit.File> fileList = new ArrayList<File>();
+    private ClientAdapter clientAdapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -244,10 +244,14 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                         Log.d(TAG, "onFailure" + e.getMessage());
                     }
                 });
+                File addedFile = new File(folderName, true);
+                ((Menu)getActivity()).addFile(addedFile);
                 AddNewBottomSheetDialog.this.dismiss(); //close dialog
-                getActivity().finish();
-                getActivity().overridePendingTransition(0, 0);
+                //startActivity(new Intent(getActivity(), Menu.class));
                 //getActivity().finish(); //refresh
+                //startActivity(getActivity().getIntent());
+                //getActivity().overridePendingTransition(0, 0); //remove
+
             }
         });
 

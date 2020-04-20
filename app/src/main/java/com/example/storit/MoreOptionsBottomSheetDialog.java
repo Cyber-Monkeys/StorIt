@@ -1,5 +1,6 @@
 package com.example.storit;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -121,11 +122,12 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getContext(), "remove Button", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "remove Button", Toast.LENGTH_SHORT).show();
                 removeFileFolder();
                 MoreOptionsBottomSheetDialog.this.dismiss(); //close dialog
-                getActivity().finish(); //refresh
-                getActivity().overridePendingTransition(0, 0); //remove blink animation
+                //getActivity().finish(); //refresh
+                startActivity(getActivity().getIntent());
+                getActivity().overridePendingTransition(0, 0); //remove
             }
         });
 

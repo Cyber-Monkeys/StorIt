@@ -243,21 +243,14 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                         Log.d(TAG, "onFailure" + e.getMessage());
                     }
                 });
-
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        clientFragment.refreshAdapter();
-//                    }
-//                });
-                //clientFragment.refreshAdapter();
                 File addedFile = new File(folderName, true);
                 ((Menu)getActivity()).addFile(addedFile);
-                AddNewBottomSheetDialog.this.dismiss(); //close dialogS
-                //getActivity().finish();
-                //getActivity().overridePendingTransition(0, 0);
+                AddNewBottomSheetDialog.this.dismiss(); //close dialog
+                //startActivity(new Intent(getActivity(), Menu.class));
                 //getActivity().finish(); //refresh
-                //dismiss();
+                //startActivity(getActivity().getIntent());
+                //getActivity().overridePendingTransition(0, 0); //remove
+
             }
         });
 

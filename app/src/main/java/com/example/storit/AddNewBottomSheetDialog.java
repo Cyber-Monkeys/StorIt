@@ -40,7 +40,6 @@ import com.google.firebase.firestore.util.FileUtil;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -244,10 +243,21 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                         Log.d(TAG, "onFailure" + e.getMessage());
                     }
                 });
-                AddNewBottomSheetDialog.this.dismiss(); //close dialog
-                getActivity().finish();
-                getActivity().overridePendingTransition(0, 0);
+
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        clientFragment.refreshAdapter();
+//                    }
+//                });
+                //clientFragment.refreshAdapter();
+                File addedFile = new File(folderName, true);
+                ((Menu)getActivity()).addFile(addedFile);
+                AddNewBottomSheetDialog.this.dismiss(); //close dialogS
+                //getActivity().finish();
+                //getActivity().overridePendingTransition(0, 0);
                 //getActivity().finish(); //refresh
+                //dismiss();
             }
         });
 

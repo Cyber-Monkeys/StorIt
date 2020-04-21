@@ -32,21 +32,19 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
     private ClientFragment clientFragment = new ClientFragment();
     String documentPath = clientFragment.getCurrentDocumentPath();
     String fullDirectory;
-    ArrayList<String> fileFolderArr = new ArrayList<>();
-    String strFileFolderName;
-    ImageView fileFolderImage;
-    TextView fileFolderName;
+    ImageView nodeImage;
+    TextView nodeName;
     LinearLayout shareButton, downloadButton, moveButton, duplicateButton, detailsButton, backupButton, removeButton;
     DocumentReference documentReference;
     private FirebaseFirestore db;
     FirebaseUser firebaseUser;
     FirebaseAuth mFirebaseAuth;
     String userId;
+    Node node;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        strFileFolderName = getArguments().getString("fileFolderName"); //get data from clientAdapter
         View view = inflater.inflate(R.layout.bottom_sheet_more_options, container, false);
         return view;
     }
@@ -54,13 +52,14 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        node = getArguments().getParcelable("Node");
 
         db = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = mFirebaseAuth.getCurrentUser();
         userId = firebaseUser.getUid();
-        fileFolderImage = getView().findViewById(R.id.fileFolderImage);
-        fileFolderName = getView().findViewById(R.id.fileFolderName);
+        nodeImage = getView().findViewById(R.id.fileFolderImage);
+        nodeName = getView().findViewById(R.id.fileFolderName);
         shareButton = getView().findViewById(R.id.shareButton);
         downloadButton = getView().findViewById(R.id.downloadButton);
         moveButton = getView().findViewById(R.id.moveButton);
@@ -69,18 +68,16 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
         backupButton = getView().findViewById(R.id.backupButton);
         removeButton = getView().findViewById(R.id.removeButton);
 
-        loadCurrentDirectory(); //load directory
-
         //set icon and file/folder name
-        fileFolderName.setText(strFileFolderName);
-        if (!strFileFolderName.contains("Folder")){
-            fileFolderImage.setImageResource(R.drawable.file_transparent);
+        nodeName.setText(node.getNodeName());
+        if (!node.getIsFolder()){
+            nodeImage.setImageResource(R.drawable.file_transparent);
         }
 
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "share Button" + strFileFolderName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "share Button" + node.getNodeName(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -122,64 +119,10 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getContext(), "remove Button", Toast.LENGTH_SHORT).show();
-                removeFileFolder();
-                ((Menu)getActivity()).removeFileFolder(strFileFolderName);
+                ((Menu)getActivity()).removeFileFolder(node.getNodeName());
                 MoreOptionsBottomSheetDialog.this.dismiss(); //close dialog
-//                getActivity().finish(); //refresh
-//                getActivity().overridePendingTransition(0, 0); //remove blink animation
             }
         });
 
-    }
-    //get directory from firebase and call load directory
-    private void loadCurrentDirectory(){
-        documentReference = db.document(documentPath);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-                    String directory = documentSnapshot.getString("dir");
-                    if(directory != null) {
-                        fullDirectory = directory;
-                    }
-                    loadDirectory();
-                } else{
-                    Toast.makeText(getContext(), "not exists", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "FAILURE " + e.getMessage());
-            }
-        });
-    }
-    //put each file/folder in an array
-    private void loadDirectory(){
-        String[] files = fullDirectory.split(",");
-        for (int i = 1; i < files.length; i++) {
-            fileFolderArr.add(files[i]);
-        }
-    }
-    //remove file from dir in firebase
-    private void removeFileFolder(){
-        fileFolderArr.remove(strFileFolderName);
-        fullDirectory = "";
-        for (String fileFolder : fileFolderArr){
-            fullDirectory += "," + fileFolder;
-        }
-        documentReference = db.document(documentPath);
-        documentReference.update("dir", fullDirectory).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Directory updated" );
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure" + e.getMessage());
-            }
-        });
     }
 }

@@ -194,45 +194,9 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //when you create a folder, set a field "dir"
-                String folderName = mFolderText.getText().toString().trim();
-                String currentDocumentPath = ((Menu)getActivity()).clientFragment.getCurrentDocumentPath();
-                String newDocumentPath = currentDocumentPath + "/" + folderName + "/" + userId;
-                documentReference = db.document(newDocumentPath);
-                ArrayList<Node> arrFile = new ArrayList<Node>();
-                Map<String, Object> docData = new HashMap<>();
-                docData.put("directory", arrFile);
-
-                documentReference.set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Folder added" );
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure" + e.getMessage());
-                    }
-                });
-
-                documentReference = db.document(currentDocumentPath);
-                ArrayList<Node> nodeList = ((Menu)getActivity()).clientFragment.getNodeList();
-                nodeList.add(new Folder(folderName));
-                 documentReference.update("directory", nodeList).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Directory updated" );
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure" + e.getMessage());
-                    }
-                });
-                ((Menu)getActivity()).clientFragment.refreshAdapter();
+                Folder newFolder = new Folder(mFolderText.getText().toString());
+                ((Menu)getActivity()).clientFragment.addFolder(newFolder);
                 AddNewBottomSheetDialog.this.dismiss(); //close dialog
-
             }
         });
 

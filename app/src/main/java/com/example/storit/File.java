@@ -1,5 +1,8 @@
 package com.example.storit;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
 public class File extends Node{
@@ -19,6 +22,45 @@ public class File extends Node{
         this.isFolder = false;
         chunks = new ArrayList<Chunk>();
     }
+
+
+
+
+    private File(Parcel in) {
+        fileId = in.readInt();
+        nodeName = in.readString();
+        fileSize = in.readInt();
+        fileType = in.readString();
+        fileKey = in.readString();
+        byte tmpIsFolder = in.readByte();
+        isFolder = tmpIsFolder == 0 ? null : tmpIsFolder == 1;
+    }
+
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(fileId);
+        dest.writeString(nodeName);
+        dest.writeInt(fileSize);
+        dest.writeString(fileType);
+        dest.writeString(fileKey);
+        dest.writeByte((byte) (isFolder == null ? 0 : isFolder ? 1 : 2));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<File> CREATOR = new Creator<File>() {
+        @Override
+        public File createFromParcel(Parcel in) {
+            return new File(in);
+        }
+
+        @Override
+        public File[] newArray(int size) {
+            return new File[size];
+        }
+    };
 
     public int getFileId() {
         return fileId;

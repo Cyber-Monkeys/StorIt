@@ -171,11 +171,11 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 if(documentSnapshot.exists()){
                     String email = documentSnapshot.getString("Email");
                     String username = documentSnapshot.getString("Username");
-                    String directory = documentSnapshot.getString("directory");
-                    if(directory != null) {
-                        fullDirectory = directory;
-                    }
-                    loadDirectory();
+//                    String directory = documentSnapshot.getString("directory");
+//                    if(directory != null) {
+//                        fullDirectory = directory;
+//                    }
+//                    loadDirectory();
                     if (username == null){
                         headerName.setText("Username");
                     }else{
@@ -290,19 +290,19 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         mGoogleSignInClient.signOut();
     }
 
-    public void loadDirectory() {
-        String[] files = fullDirectory.split(",");
-        for (int i = 1; i < files.length; i++) {
-            File f = new File(0, 0, files[i], ".txt", false);
-            this.clientFragment.addFile(f);
-        }
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                clientFragment.refreshAdapter();
-            }
-        });
-    }
+//    public void loadDirectory() {
+//        String[] files = fullDirectory.split(",");
+//        for (int i = 1; i < files.length; i++) {
+//            File f = new File(0, 0, files[i], ".txt", false);
+//            this.clientFragment.addFile(f);
+//        }
+//        this.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                clientFragment.refreshAdapter();
+//            }
+//        });
+//    }
     public void addFile(File addedFile) {
         Log.d(TAG, "adding new file");
         this.clientFragment.addFile(addedFile);
@@ -325,13 +325,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
     }
-    public void doneUploading(int fileId, int fileSize, String fileType) {
-        File addedFile = new File(fileId, fileSize, fileUploading, fileType, false);
+    public void doneUploading(int fileId, int fileSize, String fileType, String fileKey) {
+        File addedFile = new File(fileId, fileUploading, fileSize, fileType, fileKey);
         addFile(addedFile);
-//        if(!fileUploading.equals("")) {
-//            addFile(addedFile);
-////            loadDirectory(fileUploading);
-//        }
     }
 
     //navigation drawer
@@ -617,12 +613,25 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(!documentSnapshot.exists()){
+                    User currentUser = new User(mFirebaseAuth.getCurrentUser().getDisplayName(),
+                            mFirebaseAuth.getCurrentUser().getEmail(),
+                            mFirebaseAuth.getCurrentUser().getDisplayName()
+                            , "", new Date(), "EU");
+                    Plan userPlan = new Plan(1);
+                    currentUser.setPlan(userPlan);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Email", mFirebaseAuth.getCurrentUser().getEmail());
-                    user.put("Username", mFirebaseAuth.getCurrentUser().getDisplayName());
-                    user.put("Name", mFirebaseAuth.getCurrentUser().getDisplayName());
-                    Date date = new Date(); //set date to null
-                    user.put("Birthdate", date);
+                    user.put("Username", currentUser.getUsername());
+                    user.put("Name", currentUser.getFirstName() + " " + currentUser.getLastName());
+                    user.put("Email", currentUser.getEmail());
+                    user.put("Birthdate", currentUser.getDateOfBirth());
+                    user.put("Region", currentUser.getRegion());
+                    Map<String, Object> planData = new HashMap<>();
+                    planData.put("planId", currentUser.getPlan().getPlanId());
+                    planData.put("planStorage", currentUser.getPlan().getPlanCopies());
+                    planData.put("planCopies", currentUser.getPlan().getPlanCopies());
+                    planData.put("planRegions", currentUser.getPlan().getPlanRegions());
+                    planData.put("planRenewalDate", currentUser.getPlan().getRenewalDate());
+                    user.put("plan", planData);
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {

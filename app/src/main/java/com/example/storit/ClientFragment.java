@@ -145,41 +145,68 @@ public class ClientFragment extends Fragment {
                 loadCurrentDirectory();
             }
         });
-
-//        testingFunction();
-//        getDataTesting();
-
     }
     public void addFile(File addedFile) {
         nodeList.add(addedFile);
-//
-//        String currentDocumentPath = getCurrentDocumentPath();
-//        documentReference = db.document(currentDocumentPath);
-//        //add folderName to dir string of current directory
-//        String updatedFullDirectory = getFullDirectory() + "," + addedFile.getFileName();
-//
-//        documentReference.update("dir", updatedFullDirectory).addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//                Log.d(TAG, "Directory updated" );
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.d(TAG, "onFailure" + e.getMessage());
-//            }
-//        });
-        //updateCurrentDirOfDevice(documentPath);
+        updateDirectory();
     }
     public void removeFile(String removeFile) {
         nodeList.removeIf(node -> (removeFile == node.getNodeName()));
+        updateDirectory();
     }
+
     public void refreshAdapter() {
         clientAdapter.notifyDataSetChanged();
 //        clientAdapter = new ClientAdapter(getView().getContext(), fileList.toArray(new File[fileList.size()]),image.toArray(new Integer[image.size()]));
 //        gridView.setAdapter(clientAdapter);
 
     }
+
+    public void addFolder(Folder newFolder) {
+        //when you create a folder, set a field "dir"
+        nodeList.add(newFolder);
+        addFolderDocumentPath(newFolder.getNodeName());
+        updateDirectory();
+    }
+    public void addFolderDocumentPath(String newFolderName) {
+        String currentDocumentPath = getCurrentDocumentPath();
+        String newDocumentPath = currentDocumentPath + "/" + newFolderName + "/" + userId;
+        documentReference = db.document(newDocumentPath);
+        ArrayList<Node> arrFile = new ArrayList<Node>();
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("directory", arrFile);
+
+        documentReference.set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Folder added" );
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure" + e.getMessage());
+            }
+        });
+    }
+
+    public void updateDirectory() {
+        String currentDocumentPath = getCurrentDocumentPath();
+        documentReference = db.document(currentDocumentPath);
+        documentReference.update("directory", nodeList).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Directory updated" );
+                refreshDirectory();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure" + e.getMessage());
+            }
+        });
+    }
+
 
     public void refreshDirectory() {
         //nodeList.clear();

@@ -46,7 +46,7 @@ public class ClientFragment extends Fragment {
     LinearLayout goBackLinearLayout;
     private static String documentPath, rootPath;
     static String fullDirectory=""; //static - no need to instatiate this class obj
-    String userReference, testDir;
+    String userReference;
     GridView gridView;
     TextView sortName;
     FirebaseFirestore db;
@@ -58,7 +58,7 @@ public class ClientFragment extends Fragment {
 
 
 
-    private ArrayList<File> fileList = new ArrayList<File>();
+    private ArrayList<Node> nodeList = new ArrayList<Node>();
     private ClientAdapter clientAdapter;
 
     @Nullable
@@ -76,11 +76,11 @@ public class ClientFragment extends Fragment {
         mFirebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = mFirebaseAuth.getCurrentUser();
         userId = firebaseUser.getUid();
-        documentPath = "/Users/" + userId + "/TreeNode/" + userId;
-        rootPath = "/Users/" + userId + "/TreeNode/" + userId;
+        documentPath = "/Users/" + userId + "/TreeNode/" + 1;
+        rootPath = "/Users/" + userId + "/TreeNode/" + 1;
         userReference = "/Users/" + userId;
-        testDir = "/Users/" + userId + "/TreeNode/" + 1;
-        documentReference = db.document(testDir);
+        //testDir = "/Users/" + userId + "/TreeNode/" + 1;
+        documentReference = db.document(documentPath);
         editText2 = getView().findViewById(R.id.editText2);
         sortName = getView().findViewById(R.id.sortName);
         gridView = getView().findViewById(R.id.gridView);
@@ -96,9 +96,9 @@ public class ClientFragment extends Fragment {
                 if (s.toString().equals("")){
                     loadCurrentDirectory();
                 } else {
-                    loadDirectory();
                     searchFileFolder(s.toString());
                 }
+                refreshDirectory();
 
             }
 
@@ -108,23 +108,22 @@ public class ClientFragment extends Fragment {
             }
         });
 
-        clientAdapter = new ClientAdapter(getView().getContext(),fileList);
+        clientAdapter = new ClientAdapter(getView().getContext(),nodeList);
         gridView.setAdapter(clientAdapter);
-        loadCurrentDirOfDevice(); //load data to collection view
+
+        loadCurrentDirectory();
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                                     long arg3) {
                 Log.d("Webrtcclient", "download request started");
-                ((Menu) getActivity()).downloadData(fileList.get(arg2).getFileId());
-                if (fileList.get(arg2).getFileName().contains("Folder")){ //arg2 is position
-                    documentPath += "/" + fileList.get(arg2).getFileName() + "/" + userId;
-                    updateCurrentDirOfDevice(documentPath); //update dir to firebase
+                if (nodeList.get(arg2).getIsFolder()){ //arg2 is position
+                    documentPath += "/" + nodeList.get(arg2).getNodeName() + "/" + userId;
                     loadCurrentDirectory();
                 } else {
                     Log.d("Webrtcclient", "download request started");
-                    ((Menu) getActivity()).downloadData(fileList.get(arg2).getFileId());
+                    ((Menu) getActivity()).downloadData(((File)nodeList.get(arg2)).getFileId());
                 } // else statement end line
 
             }
@@ -152,7 +151,7 @@ public class ClientFragment extends Fragment {
 
     }
     public void addFile(File addedFile) {
-        fileList.add(addedFile);
+        nodeList.add(addedFile);
 //
 //        String currentDocumentPath = getCurrentDocumentPath();
 //        documentReference = db.document(currentDocumentPath);
@@ -173,7 +172,7 @@ public class ClientFragment extends Fragment {
         //updateCurrentDirOfDevice(documentPath);
     }
     public void removeFile(String removeFile) {
-        fileList.removeIf(file -> (removeFile == file.getFileName()));
+        nodeList.removeIf(node -> (removeFile == node.getNodeName()));
     }
     public void refreshAdapter() {
         clientAdapter.notifyDataSetChanged();
@@ -182,20 +181,8 @@ public class ClientFragment extends Fragment {
 
     }
 
-    public void loadDirectory() {
-        fileList.clear();
-        String[] files = fullDirectory.split(",");
-        for (int i = 1; i < files.length; i++) {
-//            fileName.add(files[i]);
-            if (files[i].contains("Folder")){
-                fileList.add(new File(files[i],true));
-//                image.add(folderImage);
-            } else {
-                fileList.add(new File(files[i],false));
-//                image.add(fileImage);
-            }
-        }
-//        tempFileName = (ArrayList<String>) fileList.clone(); //get a copy of it
+    public void refreshDirectory() {
+        //nodeList.clear();
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -205,6 +192,7 @@ public class ClientFragment extends Fragment {
     }
 
     private void loadCurrentDirectory(){
+        nodeList.clear();
         if (documentPath.equals(rootPath)){ //hide go back button
             goBackLinearLayout.setVisibility(View.INVISIBLE);
         } else {
@@ -215,18 +203,32 @@ public class ClientFragment extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(documentSnapshot.exists()){
-                    String directory = documentSnapshot.getString("dir");
-                    if(directory != null) {
-                        fullDirectory = directory;
+                    List<Object> users = (List<Object>) documentSnapshot.get("directory");
+                    //Log.d(TAG, users.get(0).toString() + " " + users.get(1).toString() + " " + users.size());
+                    for(int i = 0; i < users.size(); i++){
+                        Map<String, Object> user = (Map<String, Object>)users.get(i);
+                        String name = user.get("nodeName").toString();
+                        Boolean isFolder = (Boolean) user.get("isFolder");
+                        if(isFolder) {
+                            nodeList.add(new Folder(name));
+                        } else {
+                            String fileKey = user.get("fileKey").toString();
+                            String type = user.get("fileType").toString();
+                            int fileId = (int) user.get("fileId");
+                            int fileSize = (int) user.get("fileSize");
+                            nodeList.add(new File(fileId, name, fileSize, type, fileKey));
+                        }
                     }
-                    loadDirectory();
-                } else{
+
+                    refreshDirectory();
+                }  else{
                     Toast.makeText(getContext(), "not exists", Toast.LENGTH_SHORT).show();
                     documentReference = db.document(documentPath);
-                    Map<String, Object> user = new HashMap<>();
-                    user.put("dir", ",");
+                    ArrayList<Node> arrFile = new ArrayList<Node>();
+                    Map<String, Object> docData = new HashMap<>();
+                    docData.put("directory", arrFile);
 
-                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    documentReference.set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "dir created" );
@@ -259,118 +261,21 @@ public class ClientFragment extends Fragment {
             }
 
         }
-        updateCurrentDirOfDevice(documentPath); //update dir to firebase
+        refreshDirectory();
     } // end of removeCurrentDirectory
     private void searchFileFolder(String fileFolderName){ //searching files or folders
-        fileList.removeIf(f -> !f.getFileName().toLowerCase().contains(fileFolderName.toLowerCase()));
+        nodeList.removeIf(f -> !f.getNodeName().toLowerCase().contains(fileFolderName.toLowerCase()));
         refreshAdapter();
     } //end of searchFileFolder
 
-    //put current directory of device and send to firebase
-    //will be used so that it updated curr dir when logged in to another device
-    private void loadCurrentDirOfDevice(){
-        documentReference = db.document(userReference);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-                    String dirOfDevice = documentSnapshot.getString("currDirOfDevice");
-                    if(dirOfDevice != null) {
-                        documentPath = dirOfDevice;
-                        loadCurrentDirectory();
-                    } else { //if it is null, create and send to firebase
-                        Toast.makeText(getContext(), "create dir", Toast.LENGTH_SHORT).show();
-                        documentReference.update("currDirOfDevice", rootPath).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "Directory of device updated" );
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "onFailure" + e.getMessage());
-                            }
-                        });
-                        loadCurrentDirectory();
-                    }
 
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "FAILURE " + e.getMessage());
-            }
-        });
-    }
 
-    //update dir of device to firebase
-    //this is for to a new folder or going back
-    private void updateCurrentDirOfDevice(String currentDir){
-        documentReference = db.document(userReference);
-        documentReference.update("currDirOfDevice", currentDir).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Directory updated" );
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure" + e.getMessage());
-            }
-        });
-    }
-    //test
-//    private void testingFunction(){
-//        File file = new File("ddasd.txt", "text");
-//        File file2 = new File("ddasd.txt", "folder");
-//        ArrayList<File> arrFile = new ArrayList<>();
-//        arrFile.add(file); arrFile.add(file2);
-//
-//        Map<String, Object> docData = new HashMap<>();
-//        docData.put("testingFile", arrFile);
-//        documentReference = db.document(testDir);
-//        documentReference.set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//                Log.d(TAG, "Directory updated" );
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.d(TAG, "onFailure" + e.getMessage());
-//            }
-//        });
-//    }
-//    //test
-//    private void getDataTesting(){
-//        documentReference = db.document(testDir);
-//        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                if(documentSnapshot.exists()){
-//                    List<Map<String, Object>> users = (List<Map<String, Object>>) documentSnapshot.get("testingFile");
-//                    Log.d(TAG, users.get(0).toString() + " " + users.get(1).toString() + " " + users.size());
-//                    for(int i = 0; i < users.size(); i++){
-//                        String name = users.get(i).get("name").toString();
-//                        String type = users.get(i).get("type").toString();
-//                        Log.d(TAG, name + " " + type);
-//                    }
-//                }
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.d(TAG, "FAILURE " + e.getMessage());
-//            }
-//        });
-//    }
     //getters
     public String getCurrentDocumentPath(){
         return documentPath;
     }
-    public String getFullDirectory(){
-        return fullDirectory;
+    public ArrayList<Node> getNodeList(){
+        return nodeList;
     }
 
 }

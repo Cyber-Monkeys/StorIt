@@ -9,9 +9,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Signup extends AppCompatActivity {
+public class Signup extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     //Variables
     private static Calendar mCalendarDate;
@@ -41,6 +44,8 @@ public class Signup extends AppCompatActivity {
     private FirebaseFirestore db;
     DocumentReference documentReference;
     String userId;
+    Spinner spinner;
+    String region = "EU";
 
     //onCreate function
     @Override
@@ -63,6 +68,7 @@ public class Signup extends AppCompatActivity {
         btnSignUp = (Button) findViewById(R.id.btnSignUp);
         //Date picker (editText)
         birthdateText = (EditText) findViewById(R.id.birthdate);
+        spinner = (Spinner) findViewById(R.id.spinner2);
 
         birthdateText.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -93,7 +99,9 @@ public class Signup extends AppCompatActivity {
                 String birthDate = birthdateText.getText().toString();
                 String password = passwordText.getText().toString();
                 String confirmPassword = confirmPasswordText.getText().toString();
-
+                User currentUser = new User(username, email, firstName, lastName, mCalendarDate.getTime(), region);
+                Plan userPlan = new Plan(1);
+                currentUser.setPlan(userPlan);
                 if(username.isEmpty()){
                     usernameText.setError("Please enter Username");
                     usernameText.requestFocus();
@@ -116,6 +124,7 @@ public class Signup extends AppCompatActivity {
                     confirmPasswordText.requestFocus();
                 }else if(!(username.isEmpty() && firstName.isEmpty() && lastName.isEmpty() &&  birthDate.isEmpty()
                         && email.isEmpty() && password.isEmpty() && confirmPassword.isEmpty())){
+
                     //CHECK IF PASSWORD IS >= 6 characters
                     progressDialog.setMessage("Creating account...");
                     progressDialog.show();
@@ -133,11 +142,18 @@ public class Signup extends AppCompatActivity {
                                     documentReference = db.collection("Users").document(userId);
 
                                     Map<String, Object> user = new HashMap<>();
-                                    user.put("Username", username);
-                                    user.put("Name", firstName + " " + lastName);
-                                    user.put("Email", email);
-                                    user.put("Birthdate", mCalendarDate.getTime());
-                                    user.put("directory", "");
+                                    user.put("Username", currentUser.getUsername());
+                                    user.put("Name", currentUser.getFirstName() + " " + currentUser.getLastName());
+                                    user.put("Email", currentUser.getEmail());
+                                    user.put("Birthdate", currentUser.getDateOfBirth());
+                                    user.put("Region", currentUser.getRegion());
+                                    Map<String, Object> planData = new HashMap<>();
+                                    planData.put("planId", currentUser.getPlan().getPlanId());
+                                    planData.put("planStorage", currentUser.getPlan().getPlanCopies());
+                                    planData.put("planCopies", currentUser.getPlan().getPlanCopies());
+                                    planData.put("planRegions", currentUser.getPlan().getPlanRegions());
+                                    planData.put("planRenewalDate", currentUser.getPlan().getRenewalDate());
+                                    user.put("plan", planData);
 
                                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -170,6 +186,12 @@ public class Signup extends AppCompatActivity {
             }
         });
 
+        //add spinner for region picker
+        ArrayAdapter<CharSequence> regionAdapter = ArrayAdapter.createFromResource(this, R.array.region, android.R.layout.simple_spinner_item);
+        regionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(regionAdapter);
+        spinner.setOnItemSelectedListener(this); //enable click
+
 
     }
 
@@ -177,4 +199,17 @@ public class Signup extends AppCompatActivity {
         startActivity(new Intent (this, Login.class));
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        region = parent.getItemAtPosition(position).toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
 }

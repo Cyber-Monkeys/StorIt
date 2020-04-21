@@ -60,8 +60,6 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     String userId;
     ImageView addFolder, addSecureUpload, addUpload;
     private static final int REQUEST_CODE = 11;
-    WebRtcClient client;
-    private ClientFragment clientFragment = new ClientFragment();
 
     @Nullable
     @Override
@@ -98,17 +96,6 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                 intent.setType("*/*");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(intent, REQUEST_CODE);
-//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//
-//                // Provide read access to files and sub-directories in the user-selected
-//                // directory.
-//                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//                // Optionally, specify a URI for the directory that should be opened in
-//                // the system file picker when it loads.
-//                //intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uriToLoad);
-//
-//                startActivityForResult(intent, REQUEST_CODE);
             }
         });
 
@@ -209,13 +196,14 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 //when you create a folder, set a field "dir"
                 String folderName = mFolderText.getText().toString().trim();
-                String currentDocumentPath = clientFragment.getCurrentDocumentPath();
+                String currentDocumentPath = ((Menu)getActivity()).clientFragment.getCurrentDocumentPath();
                 String newDocumentPath = currentDocumentPath + "/" + folderName + "/" + userId;
                 documentReference = db.document(newDocumentPath);
-                Map<String, Object> user = new HashMap<>();
-                user.put("dir", ",");
+                ArrayList<Node> arrFile = new ArrayList<Node>();
+                Map<String, Object> docData = new HashMap<>();
+                docData.put("directory", arrFile);
 
-                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                documentReference.set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "Folder added" );
@@ -229,10 +217,9 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                 });
 
                 documentReference = db.document(currentDocumentPath);
-                //add folderName to dir string of current directory
-                String updatedFullDirectory = clientFragment.getFullDirectory() + "," + folderName;
-
-                 documentReference.update("dir", updatedFullDirectory).addOnSuccessListener(new OnSuccessListener<Void>() {
+                ArrayList<Node> nodeList = ((Menu)getActivity()).clientFragment.getNodeList();
+                nodeList.add(new Folder(folderName));
+                 documentReference.update("directory", nodeList).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "Directory updated" );
@@ -243,13 +230,8 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
                         Log.d(TAG, "onFailure" + e.getMessage());
                     }
                 });
-                File addedFile = new File(folderName, true);
-                ((Menu)getActivity()).addFile(addedFile);
+                ((Menu)getActivity()).clientFragment.refreshAdapter();
                 AddNewBottomSheetDialog.this.dismiss(); //close dialog
-                //startActivity(new Intent(getActivity(), Menu.class));
-                //getActivity().finish(); //refresh
-                //startActivity(getActivity().getIntent());
-                //getActivity().overridePendingTransition(0, 0); //remove
 
             }
         });
@@ -268,79 +250,3 @@ public class AddNewBottomSheetDialog extends BottomSheetDialogFragment {
     }
 } // end of main class
 
-
-
-//
-//    Uri uri = data.getData();
-//
-//    String hi = "";
-//    char[] charArr = new char[1];
-//                Log.d("STORIT---", uri.toString());
-//                        //using input stream
-//                        try {
-////                    File file = new File(uri.toString());
-////                    int fileSize = (int) file.length();
-////                    FileInputStream fin = new FileInputStream(getActivity().getContentResolver().openFileDescriptor(uri, 'r'));
-//                        // Let's say this bitmap is 300 x 600 pixels
-//
-//                        InputStream in = getActivity().getContentResolver().openInputStream(uri);
-//                        Bitmap originalBm = BitmapFactory.decodeStream(in);
-////                    Bitmap originalBm = BitmapFactory.decodeFile(uri.toString());
-//                        Bitmap bm1 = Bitmap.createBitmap(originalBm, 0, 0, originalBm.getWidth(), (originalBm.getHeight() / 2));
-//                        Bitmap bm2 = Bitmap.createBitmap(originalBm, 0, (originalBm.getHeight() / 2), originalBm.getWidth(), (originalBm.getHeight() / 2));
-//                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                        bm1.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//                        byte[] byteArray1 = stream.toByteArray();
-//                        bm1.recycle();
-//                        ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-//                        bm2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
-//                        byte[] byteArray2 = stream2.toByteArray();
-//                        bm2.recycle();
-//                        stream.close();
-//                        stream2.close();
-////                    FileInputStream fin = (FileInputStream) getActivity().getContentResolver().openInputStream(uri);
-////                    //int fileSize = fin.getChannel().size();
-////                    //InputStream in = getActivity().getContentResolver().openInputStream(uri);
-////                    int fileSize = (int) fin.getChannel().size();
-////                    Log.d("WebRtcClient", "sending file of size " + fileSize);
-////                    //FileInputStream fin = new FileInputStream(uri.toString());
-////
-////                    //BufferedInputStream bin=new BufferedInputStream(fin);
-////                    int size1 = fileSize / 2;
-////                    int size2 = fileSize / 2;
-////                    if(fileSize %2 == 1) {
-////                        size2 += 1;
-////                    }
-////                    //size2 += 8;
-////                    //byte[] bytesArray = new byte[fileSize];
-////                    byte[] bytesArray1 = new byte[size1];
-////                    byte[] bytesArray2 = new byte[size2 + 5000];
-//////                    fin.read(bytesArray);
-////                    fin.read(bytesArray1);
-////
-////                    for(int i = 0; i <5000;i++) {
-////                        bytesArray2[i] = bytesArray1[i];
-////                    }
-////                    fin.read(bytesArray2);
-////
-//////                    fin.read(bytesArray2);
-//////                    fin.read(bytesArray1, 0, size1);
-//////                    fin.read(bytesArray2, 0, size2);
-////
-////                    Log.d("WebRtcClient", "sending file of size " + fileSize);
-//////                    int i;
-//////                    while((i=bin.read())!=-1){
-//////                        charArr[i] = (char)i;
-//////                    }
-//////
-//////                    bin.close();
-////                    //client.sendImage(fileSize, bytesArray, 0);
-//                        client.sendImage(byteArray1.length, byteArray1, 0);
-//                        client.sendImage(byteArray2.length, byteArray2, 1);
-////                    fin.close();
-//                        in.close();
-//
-//
-//                        } catch (Exception e) {
-//                        e.printStackTrace();
-//                        }

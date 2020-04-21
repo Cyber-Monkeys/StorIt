@@ -89,6 +89,7 @@ public class WebRtcClient {
     int fileId;
     int fileSize = 0;
     String fileType = "";
+    String fileKey = "";
     ChunkEncryption encryptor;
     ArrayList<byte[]> imageFiles = new ArrayList<>();
 //    ArrayList<Integer> fileSizes = new ArrayList<Integer>();
@@ -193,7 +194,7 @@ public class WebRtcClient {
     public void uploadRequest(int orderIndex, DataChannel dc) {
         sendImage(chunks.get(orderIndex), dc);
         if(orderIndex == chunks.size() - 1) {
-            context.doneUploading(fileId, fileSize, fileType);
+            context.doneUploading(fileId, fileSize, fileType, fileKey);
         }
     }
     public void sendImage(byte[] file,  DataChannel dc) {

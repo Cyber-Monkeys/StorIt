@@ -2,40 +2,22 @@ package com.example.storit;
 
 import java.util.ArrayList;
 
-public class File {
+public class File extends Node{
+
     int fileId;
     int fileSize;
-    String fileName;
     String fileType; // can replace with enum
-    ArrayList<File> children;
+    String fileKey;
+    ArrayList<Chunk> chunks;
 
-    int fileImage = R.drawable.background_2;
-    public File(String fileName, boolean isFolder) {
-        this.fileName = fileName;
-        if(!isFolder) {
-            fileImage = R.drawable.background_2;
-        } else {
-            fileImage = R.drawable.ic_folder_black_24dp;
-        }
-    }
-    public File(int fileId, int fileSize, String fileName, String fileType, boolean isFolder) {
+    public File(int fileId, String nodeName, int fileSize, String fileType, String fileKey) {
         this.fileId = fileId;
+        this.nodeName = nodeName;
         this.fileSize = fileSize;
-        this.fileName = fileName;
         this.fileType = fileType;
-        if(!isFolder) {
-            fileImage = R.drawable.background_2;
-        } else {
-            fileImage = R.drawable.ic_folder_black_24dp;
-        }
-    }
-
-    public int getFileImage() {
-        return fileImage;
-    }
-
-    public void setFileImage(int fileImage) {
-        this.fileImage = fileImage;
+        this.fileKey = fileKey;
+        this.isFolder = false;
+        chunks = new ArrayList<Chunk>();
     }
 
     public int getFileId() {
@@ -46,20 +28,20 @@ public class File {
         this.fileId = fileId;
     }
 
+    public String getFileKey() {
+        return fileKey;
+    }
+
+    public void setFileKey(String fileKey) {
+        this.fileKey = fileKey;
+    }
+
     public int getFileSize() {
         return fileSize;
     }
 
     public void setFileSize(int fileSize) {
         this.fileSize = fileSize;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public String getFileType() {

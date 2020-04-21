@@ -51,8 +51,12 @@ taking effect. What constitutes a material change will be determined at our sole
     </string>
 
     <string-array name="region">
+        <item>AP</item>
         <item>EU</item>
-        <item>NAf</item>
+        <item>ME</item>
+        <item>NA</item>
+        <item>OC</item>
+        <item>SA</item>
     </string-array>
 
     <string-array name="months">

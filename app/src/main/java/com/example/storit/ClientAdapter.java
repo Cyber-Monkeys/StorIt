@@ -74,7 +74,7 @@ public class ClientAdapter extends BaseAdapter {
             public void onClick(View v) {
                 //send data to more options fragment
                 Bundle bundle = new Bundle();
-                bundle.putString("fileFolderName", nodeList.get(position).getNodeName()); //send data to fragment
+                bundle.putParcelable("Node",nodeList.get(position));
                 // set Arguments
                 MoreOptionsBottomSheetDialog bottomSheetDialog = new MoreOptionsBottomSheetDialog();
                 bottomSheetDialog.setArguments(bundle);

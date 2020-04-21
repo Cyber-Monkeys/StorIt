@@ -20,24 +20,24 @@ public class ClientAdapter extends BaseAdapter {
     //variables
     private Context context;
     private LayoutInflater inflater = null;
-    private ArrayList<File> fileList = new ArrayList<File>();
+    private ArrayList<Node> nodeList = new ArrayList<Node>();
 
     //constructor
-    public ClientAdapter(Context context, ArrayList<File> fileName){
+    public ClientAdapter(Context context, ArrayList<Node> nodeList){
         this.context = context;
-        this.fileList = fileName;
+        this.nodeList = nodeList;
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return fileList.size();
+        return nodeList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return fileList.get(position);
+        return nodeList.get(position);
     }
 
     @Override
@@ -60,8 +60,13 @@ public class ClientAdapter extends BaseAdapter {
         ImageView moreOptions = convertView.findViewById(R.id.moreOptions);
         TextView fileName = convertView.findViewById(R.id.fileName);
 
-        image.setImageResource(fileList.get(position).getFileImage());
-        fileName.setText(fileList.get(position).getFileName());
+
+        if(nodeList.get(position).getIsFolder()) {
+            image.setImageResource(R.drawable.folder_transparent2);
+        } else {
+            image.setImageResource(R.drawable.file_transparent);
+        }
+        fileName.setText(nodeList.get(position).getNodeName());
 
         //open more options
         moreOptions.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +74,7 @@ public class ClientAdapter extends BaseAdapter {
             public void onClick(View v) {
                 //send data to more options fragment
                 Bundle bundle = new Bundle();
-                bundle.putString("fileFolderName", fileList.get(position).getFileName()); //send data to fragment
+                bundle.putString("fileFolderName", nodeList.get(position).getNodeName()); //send data to fragment
                 // set Arguments
                 MoreOptionsBottomSheetDialog bottomSheetDialog = new MoreOptionsBottomSheetDialog();
                 bottomSheetDialog.setArguments(bundle);

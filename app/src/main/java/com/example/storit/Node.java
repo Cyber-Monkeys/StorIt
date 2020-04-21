@@ -1,6 +1,9 @@
 package com.example.storit;
 
-public abstract class Node {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public abstract class Node implements Parcelable {
     String nodeName;
     Boolean isFolder;
 

@@ -53,7 +53,8 @@ public class ChunkEncryption {
 
         byte[] data = getSecretKey().getEncoded();
         SecretKeySpec secretKeySpec = new SecretKeySpec(data, 0, data.length, KEY_SPEC_ALGORITHM);
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM, PROVIDER); // creating java cipher instance
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM); // creating java cipher instance
+
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(new byte[cipher.getBlockSize()])); //Initializing the Cipher
 
         return cipher.doFinal(fileData);

@@ -130,7 +130,7 @@ public class Profile extends AppCompatActivity {
                     Timestamp dateInTime = (Timestamp) planData.get("planRenewalDate");
                     Date planRenewalDate = dateInTime.toDate();
                     Plan plan = new Plan(planId, planRegions, planRenewalDate);
-                    currentUser = new User(username, name, email, birthDate, region, plan);
+                    currentUser = new User(username, email, name, birthDate, region, plan);
 
                     textName.setText(currentUser.getName());
                     textUsername.setText(currentUser.getUsername());

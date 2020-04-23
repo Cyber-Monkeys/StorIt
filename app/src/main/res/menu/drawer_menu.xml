@@ -4,10 +4,6 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_payment_details"
-            android:icon="@drawable/icons8_online_payment_24"
-            android:title="Payment Details" />
-        <item
             android:id="@+id/nav_plan"
             android:icon="@drawable/icons8_crown_24"
             android:title="Plans" />

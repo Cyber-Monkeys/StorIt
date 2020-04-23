@@ -32,9 +32,10 @@
         android:layout_width="350dp"
         android:layout_height="170dp"
         android:layout_marginTop="10dp"
+        android:background="@drawable/plans_design"
+        android:onClick="purchasePlanClicked"
         android:orientation="vertical"
         android:weightSum="100"
-        android:background="@drawable/plans_design"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
@@ -43,53 +44,53 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="30"
-            android:text="Plan 1"
-            android:paddingLeft="20dp"
             android:elevation="5dp"
-            android:textStyle="bold"
-            android:textSize="30sp"/>
+            android:paddingLeft="20dp"
+            android:text="Plan 1"
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="70"
-            android:weightSum="12"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="12">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:gravity="center"
+                android:text="$5"
                 android:textSize="50sp"
-                android:text="$___"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:weightSum="4"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:weightSum="4">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
                     android:layout_gravity="center"
+                    android:layout_weight="2"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="1 GB"/>
+                        android:text="1 GB"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="2 Copies"/>
+                        android:text="2 Copies"
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -99,16 +100,16 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:weightSum="4"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:weightSum="4">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:textSize="20sp"
-                    android:text="1 Region"/>
+                    android:text="1 Region"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
@@ -121,9 +122,10 @@
         android:layout_width="350dp"
         android:layout_height="170dp"
         android:layout_marginTop="10dp"
+        android:background="@drawable/plans_design"
+        android:onClick="purchasePlanClicked"
         android:orientation="vertical"
         android:weightSum="100"
-        android:background="@drawable/plans_design"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout1">
@@ -132,53 +134,53 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="30"
-            android:text="Plan 2"
-            android:paddingLeft="20dp"
             android:elevation="5dp"
-            android:textStyle="bold"
-            android:textSize="30sp"/>
+            android:paddingLeft="20dp"
+            android:text="Plan 2"
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="70"
-            android:weightSum="12"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="12">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:gravity="center"
+                android:text="$10"
                 android:textSize="50sp"
-                android:text="$___"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:weightSum="4"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:weightSum="4">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
                     android:layout_gravity="center"
+                    android:layout_weight="2"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="5 GB"/>
+                        android:text="5 GB"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="2 Copies"/>
+                        android:text="2 Copies"
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -188,16 +190,16 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:weightSum="4"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:weightSum="4">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:textSize="20sp"
-                    android:text="2 Regions"/>
+                    android:text="2 Regions"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
@@ -206,12 +208,14 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="350dp"
         android:layout_height="170dp"
         android:layout_marginTop="10dp"
+        android:background="@drawable/plans_design"
+        android:onClick="purchasePlanClicked"
         android:orientation="vertical"
         android:weightSum="100"
-        android:background="@drawable/plans_design"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
@@ -220,53 +224,53 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="30"
-            android:text="Plan 3"
-            android:paddingLeft="20dp"
             android:elevation="5dp"
-            android:textStyle="bold"
-            android:textSize="30sp"/>
+            android:paddingLeft="20dp"
+            android:text="Plan 3"
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="70"
-            android:weightSum="12"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="12">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:gravity="center"
+                android:text="$15"
                 android:textSize="50sp"
-                android:text="$___"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:weightSum="4"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:weightSum="4">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
                     android:layout_gravity="center"
+                    android:layout_weight="2"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="5 GB"/>
+                        android:text="5 GB"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="3 Copies"/>
+                        android:text="3 Copies"
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -276,16 +280,16 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:weightSum="4"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:weightSum="4">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:textSize="20sp"
-                    android:text="2 Regions"/>
+                    android:text="2 Regions"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 

@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
@@ -61,6 +63,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static java.lang.Math.toIntExact;
 
 public class Menu extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -101,6 +105,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     AddNewBottomSheetDialog bottomSheetDialog;
     View layout;
     Handler myHandler;
+    User currentUser;
 
 
     static String sharedPrefDbName = "STORITDB";
@@ -169,8 +174,18 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(documentSnapshot.exists()){
-                    String email = documentSnapshot.getString("Email");
                     String username = documentSnapshot.getString("Username");
+                    String name = documentSnapshot.getString("Name");
+                    String email = documentSnapshot.getString("Email");
+                    Date birthDate = documentSnapshot.getDate("Birthdate");
+                    String region = documentSnapshot.getString("Region");
+                    Map<String, Object> planData = (Map<String, Object>) documentSnapshot.get("plan");
+                    int planId = toIntExact((long) planData.get("planId"));
+                    ArrayList<String> planRegions = (ArrayList<String>) planData.get("planRegions");
+                    Timestamp dateInTime = (Timestamp) planData.get("planRenewalDate");
+                    Date planRenewalDate = dateInTime.toDate();
+                    Plan plan = new Plan(planId, planRegions, planRenewalDate);
+                    currentUser = new User(username, name, email, birthDate, region, plan);
 //                    String directory = documentSnapshot.getString("directory");
 //                    if(directory != null) {
 //                        fullDirectory = directory;
@@ -179,10 +194,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                     if (username == null){
                         headerName.setText("Username");
                     }else{
-                        headerName.setText(username);
+                        headerName.setText(currentUser.getUsername());
                     }
 
-                    headerEmail.setText(email);
+                    headerEmail.setText(currentUser.getEmail());
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -334,11 +349,11 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()){
-            case R.id.nav_payment_details:
-                startActivity(new Intent(this, PaymentDetails.class));
-                break;
             case R.id.nav_plan:
-                startActivity(new Intent(this, Plans.class));
+                // pass the plan
+                Intent i = new Intent(this, Plans.class);
+                i.putExtra("planId",currentUser.getPlan().getPlanId());
+                startActivity(i);
                 break;
             case R.id.nav_help:
                 startActivity(new Intent(this, Help.class));
@@ -616,12 +631,12 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                     User currentUser = new User(mFirebaseAuth.getCurrentUser().getDisplayName(),
                             mFirebaseAuth.getCurrentUser().getEmail(),
                             mFirebaseAuth.getCurrentUser().getDisplayName()
-                            , "", new Date(), "EU");
+                            , new Date(), "EU");
                     Plan userPlan = new Plan(1);
                     currentUser.setPlan(userPlan);
                     Map<String, Object> user = new HashMap<>();
                     user.put("Username", currentUser.getUsername());
-                    user.put("Name", currentUser.getFirstName() + " " + currentUser.getLastName());
+                    user.put("Name", currentUser.getName());
                     user.put("Email", currentUser.getEmail());
                     user.put("Birthdate", currentUser.getDateOfBirth());
                     user.put("Region", currentUser.getRegion());
@@ -631,6 +646,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                     planData.put("planCopies", currentUser.getPlan().getPlanCopies());
                     planData.put("planRegions", currentUser.getPlan().getPlanRegions());
                     planData.put("planRenewalDate", currentUser.getPlan().getRenewalDate());
+                    planData.put("planCost", currentUser.getPlan().getPlanCost());
                     user.put("plan", planData);
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override

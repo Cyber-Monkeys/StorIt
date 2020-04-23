@@ -9,27 +9,59 @@ public class Plan {
     ArrayList<String> planRegions;
     int planCopies;
     Date renewalDate;
+    int planCost;
 
     public Plan(int planId) {
         this.planId = planId;
+        planRegions = new ArrayList<String>();
         if(planId == 1) {
             planStorage = 1000;
             planCopies = 2;
+            planCost = 5;
             planRegions.add("EU");
             planRegions.add("NA");
         } else if(planId == 2) {
             planStorage = 5000;
             planCopies = 2;
+            planCost = 10;
             planRegions.add("EU");
             planRegions.add("NA");
         } else if(planId == 3) {
             planStorage = 5000;
             planCopies = 3;
+            planCost = 15;
             planRegions.add("EU");
             planRegions.add("EU");
             planRegions.add("NA");
         }
         this.renewalDate = new Date();
+    }
+
+    public Plan(int planId, ArrayList<String> planRegions, Date planRenewalDate) {
+        this.planId = planId;
+        if(planId == 1) {
+            planStorage = 1000;
+            planCopies = 2;
+            planCost = 5;
+        } else if(planId == 2) {
+            planStorage = 5000;
+            planCopies = 2;
+            planCost = 10;
+        } else if(planId == 3) {
+            planStorage = 5000;
+            planCopies = 3;
+            planCost = 15;
+        }
+        this.planRegions = planRegions;
+        this.renewalDate = planRenewalDate;
+    }
+
+    public int getPlanCost() {
+        return planCost;
+    }
+
+    public void setPlanCost(int planCost) {
+        this.planCost = planCost;
     }
 
     public int getPlanId() {

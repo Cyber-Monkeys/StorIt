@@ -20,11 +20,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,8 +46,12 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EditProfile extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -53,7 +59,7 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
     //variables
     private static final String TAG = "AndroidClarified ----";
     public static final int PICK_IMAGE = 1;
-    private TextView changePhoto;
+    private TextView changePhoto, planIdText, planStorageText, planCopiesText, planCostText, planRenewalDateText;
     private EditText editName, editUsername, editEmail, editBirthdate;
     private ImageView circularImage;
     private Toolbar toolbar;
@@ -66,7 +72,8 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
     private String userId;
     private Uri imageUri;
     private Bitmap bitmap;
-    private Spinner spinner;
+    private LinearLayout regionsLayout;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +93,13 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
         editUsername = (EditText) findViewById(R.id.editUsername);
         editEmail = (EditText) findViewById(R.id.editEmail);
         editBirthdate = (EditText) findViewById(R.id.editBirthdate);
-        spinner = findViewById(R.id.spinner);
+        planIdText = (TextView) findViewById(R.id.planId);
+        planCopiesText = (TextView) findViewById(R.id.planCopies);
+        planStorageText = (TextView) findViewById(R.id.planStorage);
+        planRenewalDateText = (TextView) findViewById(R.id.planRenewalDate);
+        planCostText = (TextView) findViewById(R.id.planCost);
+        regionsLayout = (LinearLayout)findViewById(R.id.regionsLayout);
+
 
         //setting profile photo from firebase
         if(firebaseUser.getPhotoUrl() != null){
@@ -102,11 +115,30 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
         String email = i.getStringExtra("Email");
         String name = i.getStringExtra("Name");
         String birthdate = i.getStringExtra("Birthdate");
-
+        String region = i.getStringExtra("Region");
+        int planId = i.getIntExtra("planId", 1);
+        ArrayList<String> planRegions = i.getStringArrayListExtra("planRegions");
+        String planRenewalDate = i.getStringExtra("planRenewalDate");
+        int planCopies = i.getIntExtra("planCopies", -1);
+        int planStorage = i.getIntExtra("planStorage", -1);
+        int planCost = i.getIntExtra("planCost", -1);
+        String dates[] = planRenewalDate.split("/");
+        Calendar mCalendar = Calendar.getInstance();
+        mCalendar.set(Integer.parseInt(dates[2]),Integer.parseInt(dates[1]), Integer.parseInt(dates[0]));
+        Plan plan = new Plan(planId, planRegions, new Date(mCalendar.getTimeInMillis()));
+        dates = birthdate.split("/");
+        mCalendar.set(Integer.parseInt(dates[2]),Integer.parseInt(dates[1]), Integer.parseInt(dates[0]));
+        currentUser = new User(username, email, name, new Date(mCalendar.getTimeInMillis()), region, plan);
         editName.setText(name);
         editUsername.setText(username);
         editBirthdate.setText(birthdate);
         editEmail.setText(email);
+        planIdText.setText("Plan " + planId);
+        planCopiesText.setText(planCopies + " copies");
+        planStorageText.setText(planStorage + " GB");
+        planRenewalDateText.setText("RenewalDate: " +planRenewalDate);
+        planCostText.setText("$ " + planCost);
+
 
         //datepicker
         editBirthdate.setOnClickListener(new View.OnClickListener(){
@@ -155,12 +187,31 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
                 startActivityForResult(intent, PICK_IMAGE);
             }
         });
+        regionsLayout.setWeightSum(planRegions.size() * 2);
+        for(int j = 0; j < planRegions.size();j++) {
+            TextView regionHeaderText = new TextView(this);
+            regionHeaderText.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            regionHeaderText.setGravity(0);
+            regionHeaderText.setText("Region " + (j + 1));
+            regionHeaderText.setTextSize(20);
+            Spinner regionSpinner = new Spinner(this);
+            regionSpinner.setId(j);
+            regionSpinner.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            //add spinner for region picker
+            ArrayAdapter<CharSequence> regionAdapter = ArrayAdapter.createFromResource(this, R.array.region, android.R.layout.simple_spinner_item);
+            regionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            regionSpinner.setAdapter(regionAdapter);
+            regionSpinner.setOnItemSelectedListener(this); //enable click
+            int value = regionAdapter.getPosition(currentUser.getPlan().getPlanRegions().get(j));
+            regionSpinner.setSelection(value);
+            regionsLayout.addView(regionHeaderText);
+            regionsLayout.addView(regionSpinner);
+        }
 
-        //add spinner for region picker
-        ArrayAdapter<CharSequence> regionAdapter = ArrayAdapter.createFromResource(this, R.array.region, android.R.layout.simple_spinner_item);
-        regionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(regionAdapter);
-        spinner.setOnItemSelectedListener(this); //enable click
     }
 
     //add save button in toolbar
@@ -180,28 +231,47 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
                 user.put("Name", editName.getText().toString());
                 user.put("Username", editUsername.getText().toString());
                 user.put("Birthdate", mCalendarDate.getTime());
-
-                //check if email from database is not edited
-                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                user.put("Region", currentUser.getRegion());
+                Map<String, Object> planData = new HashMap<>();
+                planData.put("planId", currentUser.getPlan().getPlanId());
+                planData.put("planStorage", currentUser.getPlan().getPlanCopies());
+                planData.put("planCopies", currentUser.getPlan().getPlanCopies());
+                planData.put("planRegions", currentUser.getPlan().getPlanRegions());
+                planData.put("planRenewalDate", currentUser.getPlan().getRenewalDate());
+                planData.put("planCost", currentUser.getPlan().getPlanCost());
+                user.put("plan", planData);
+//                //check if email from database is not edited
+//                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                        if(documentSnapshot.exists()){
+//
+//                            String email = documentSnapshot.getString("Email");
+//
+//                            if (email.equals(editEmail.getText().toString())){
+//                                //update database
+//                                documentReference.update(user);
+//                            } else {
+//                                editEmail.setError("Email shouldn't be edited");
+//                            }
+//
+//                        }
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.d(TAG, "FAILURE " + e.getMessage());
+//                    }
+//                });
+                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if(documentSnapshot.exists()){
-
-                            String email = documentSnapshot.getString("Email");
-
-                            if (email.equals(editEmail.getText().toString())){
-                                //update database
-                                documentReference.update(user);
-                            } else {
-                                editEmail.setError("Email shouldn't be edited");
-                            }
-
-                        }
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "user profile created");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "FAILURE " + e.getMessage());
+                        Log.d(TAG, "onFailure" + e.getMessage());
                     }
                 });
 
@@ -218,7 +288,7 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
                     public void run() {
                         // Do something after 5s = 5000ms
                         startActivity(new Intent(EditProfile.this, Profile.class));
-                        finish();
+//                        finish();
                     }
                 }, 4000);
 
@@ -315,6 +385,10 @@ public class EditProfile extends AppCompatActivity implements AdapterView.OnItem
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String text = parent.getItemAtPosition(position).toString();
+        int regionId = parent.getId();
+        ArrayList<String> regions = currentUser.getPlan().getPlanRegions();
+        regions.set(regionId, text);
+        currentUser.getPlan().setPlanRegions(regions);
         Toast.makeText(parent.getContext(), text, Toast.LENGTH_SHORT).show();
     }
 

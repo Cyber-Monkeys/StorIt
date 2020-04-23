@@ -10,11 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".PurchasePlan"></activity>
-        <activity android:name=".EditPaymentDetails" />
         <activity android:name=".EditServer" />
 
         <activity android:name=".ServerInformation" />
-        <activity android:name=".AddCardPage" />
         <activity
             android:name=".Login"
             android:screenOrientation="portrait" />
@@ -23,10 +21,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Profile"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".PaymentDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

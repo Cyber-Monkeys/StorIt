@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ public class Plans extends AppCompatActivity {
     Toolbar toolbar;
     TextView toolbarTitle;
     LinearLayout linearLayout;
+    int planId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +46,40 @@ public class Plans extends AppCompatActivity {
             }
         });
 
-        linearLayout = findViewById(R.id.linearLayout1);
-        linearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Plans.this, PurchasePlan.class));
-            }
-        });
+        Intent i = getIntent();
+        planId = i.getIntExtra("planId", -1);
+        switch(planId) {
+            case 1:
+                linearLayout = (LinearLayout) findViewById(R.id.linearLayout1);
+                break;
+            case 2:
+                linearLayout = (LinearLayout) findViewById(R.id.linearLayout2);
+                break;
+            case 3:
+                linearLayout = (LinearLayout) findViewById(R.id.linearLayout3);
+                break;
+        }
+        linearLayout.setBackgroundColor(Color.argb(100, 53, 232, 65));
+
+    }
+
+    public void purchasePlanClicked(View v) {
+        // pass the plan to the next activity
+        Boolean isPurchased = false;
+        int id = -1;
+        if(v.getId() == R.id.linearLayout1) {
+            id = 1;
+        } else if(v.getId() == R.id.linearLayout2) {
+            id = 2;
+        } else if(v.getId() == R.id.linearLayout3) {
+            id = 3;
+        }
+        if(id == planId) {
+            isPurchased = true;
+        }
+        Intent i = new Intent(Plans.this, PurchasePlan.class);
+        i.putExtra("isPurchased", isPurchased);
+        i.putExtra("planId", id);
+        startActivity(i);
     }
 }

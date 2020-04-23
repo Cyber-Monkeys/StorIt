@@ -1,59 +1,52 @@
 package com.example.storit;
 
+import android.os.Parcelable;
+
 import java.util.Date;
 
 public class User {
     String username;
     String email;
-    String firstName;
-    String lastName;
+    String name;
     Date dateOfBirth;
     String region;
     Plan plan;
     String privateKey;
     String publicKey;
 
-    public User(String username, String email, String firstName,
-                String lastName, Date dateOfBirth, String region) {
+    public User(String username, String email, String name, Date dateOfBirth, String region) {
         this.username = username;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.region = region;
     }
-    public User(String username, String email, String firstName,
-                String lastName, Date dateOfBirth, String region, Plan plan) {
+    public User(String username, String email, String name, Date dateOfBirth, String region, Plan plan) {
         this.username = username;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.region = region;
         this.plan = plan;
     }
 
 
-    public User(String username, String email, String firstName,
-                String lastName, Date dateOfBirth, String region,
+    public User(String username, String email, String name, Date dateOfBirth, String region,
                 String privateKey, String publicKey) {
         this.username = username;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.region = region;
         this.privateKey = privateKey;
         this.publicKey = publicKey;
     }
 
-    public User(String username, String email, String firstName,
-                String lastName, Date dateOfBirth, String region, Plan plan,
+    public User(String username, String email, String name, Date dateOfBirth, String region, Plan plan,
                 String privateKey, String publicKey) {
         this.username = username;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.region = region;
         this.plan = plan;
@@ -76,20 +69,12 @@ public class User {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Date getDateOfBirth() {

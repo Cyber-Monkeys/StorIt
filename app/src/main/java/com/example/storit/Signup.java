@@ -99,7 +99,7 @@ public class Signup extends AppCompatActivity implements AdapterView.OnItemSelec
                 String birthDate = birthdateText.getText().toString();
                 String password = passwordText.getText().toString();
                 String confirmPassword = confirmPasswordText.getText().toString();
-                User currentUser = new User(username, email, firstName, lastName, mCalendarDate.getTime(), region);
+                User currentUser = new User(username, email, firstName + lastName, mCalendarDate.getTime(), region);
                 Plan userPlan = new Plan(1);
                 currentUser.setPlan(userPlan);
                 if(username.isEmpty()){
@@ -143,7 +143,7 @@ public class Signup extends AppCompatActivity implements AdapterView.OnItemSelec
 
                                     Map<String, Object> user = new HashMap<>();
                                     user.put("Username", currentUser.getUsername());
-                                    user.put("Name", currentUser.getFirstName() + " " + currentUser.getLastName());
+                                    user.put("Name", currentUser.getName());
                                     user.put("Email", currentUser.getEmail());
                                     user.put("Birthdate", currentUser.getDateOfBirth());
                                     user.put("Region", currentUser.getRegion());

@@ -169,15 +169,35 @@
         app:layout_constraintStart_toStartOf="@+id/textView13"
         app:layout_constraintTop_toBottomOf="@+id/textView13">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="30"
-            android:text="Plan 3"
-            android:paddingLeft="20dp"
-            android:elevation="5dp"
-            android:textStyle="bold"
-            android:textSize="30sp"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/planId"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="40"
+                android:elevation="5dp"
+                android:paddingLeft="20dp"
+                android:text="Plan 3"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/planRenewalDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="60"
+                android:ems="10"
+                android:gravity="center_vertical"
+                android:paddingRight="10dp"
+                android:text="RenewalDate:"
+                android:textAlignment="textEnd"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -187,13 +207,14 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/planCost"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:gravity="center"
-                android:textSize="50sp"
                 android:text="$___"
-                android:textStyle="bold"/>
+                android:textSize="50sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -210,37 +231,30 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/planStorage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="5 GB"/>
+                        android:text="5 GB"
+                        android:textSize="20sp" />
 
                     <TextView
+                        android:id="@+id/planCopies"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="3 Copies"/>
+                        android:text="3 Copies"
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/regionsLayout"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:weightSum="4"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:textSize="20sp"
-                    android:text="2 Regions"/>
-
-            </LinearLayout>
+                android:orientation="vertical"
+                android:weightSum="4" />
 
         </LinearLayout>
 

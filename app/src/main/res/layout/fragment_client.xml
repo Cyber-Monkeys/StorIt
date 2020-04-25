@@ -59,6 +59,44 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/cancelMove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="1dp"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        android:background="@color/white"
+        app:layout_constraintEnd_toStartOf="@id/moveHere"
+        app:layout_constraintTop_toBottomOf="@+id/editText2">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/moveHere"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="1dp"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        android:background="@color/white"
+        app:layout_constraintEnd_toStartOf="@id/goBack"
+        app:layout_constraintTop_toBottomOf="@+id/editText2">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Move Here" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/goBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -87,12 +125,13 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="5dp"
-        android:paddingBottom="50dp"
         android:numColumns="2"
+        android:paddingBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sortBy" >
-    </GridView>
+        app:layout_constraintTop_toBottomOf="@+id/sortBy"
+        app:layout_constraintVertical_bias="1.0"></GridView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

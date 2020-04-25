@@ -1,11 +1,17 @@
 package com.example.storit;
 
+import android.app.ActionBar;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -13,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -92,6 +99,9 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(), "move Button", Toast.LENGTH_SHORT).show();
+                MoreOptionsBottomSheetDialog.this.dismiss(); //close dialog
+                Folder newFolder = new Folder(node.getNodeName());
+                ((Menu)getActivity()).clientFragment.pressedMoveMoreOptions(newFolder);
             }
         });
 
@@ -106,6 +116,7 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(), "details Button", Toast.LENGTH_SHORT).show();
+                showNodeInfoDialog();
             }
         });
 
@@ -124,5 +135,46 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
             }
         });
 
+    }
+
+    //set dialog add folder
+    private void showNodeInfoDialog(){
+        //AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        if (node.isFolder){
+            builder.setTitle("Folder Information");
+        } else {
+            builder.setTitle("File Information");
+        }
+
+        //set linear layout
+        LinearLayout linearLayout = new LinearLayout(getContext());
+        linearLayout.setFocusableInTouchMode(true);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        //views to set in dialog
+        final TextView nodeName = new TextView(getContext());
+        final TextView nodeType = new TextView(getContext());
+        nodeName.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+        nodeType.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+        nodeName.setText("Name: " + node.nodeName);
+        if(node.isFolder){
+            nodeType.setText("Type: Folder");
+        } else {
+            nodeType.setText("Type: File");
+        }
+
+        linearLayout.addView(nodeName);
+        linearLayout.addView(nodeType);
+        linearLayout.setPadding(50,10,10,10);
+
+        builder.setView(linearLayout);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Cancel dialog
+                dialog.dismiss();
+            }
+        });
+        builder.create().show(); //display dialog
     }
 }

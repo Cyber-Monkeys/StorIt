@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentActivity;
 public class ClientAdapter extends BaseAdapter {
 
     //variables
+    ImageView moreOptions;
     private Context context;
     private LayoutInflater inflater = null;
     private ArrayList<Node> nodeList = new ArrayList<Node>();
@@ -57,12 +58,13 @@ public class ClientAdapter extends BaseAdapter {
         }
 
         ImageView image = convertView.findViewById(R.id.image);
-        ImageView moreOptions = convertView.findViewById(R.id.moreOptions);
+        moreOptions = convertView.findViewById(R.id.moreOptions);
         TextView fileName = convertView.findViewById(R.id.fileName);
 
 
         if(nodeList.get(position).getIsFolder()) {
             image.setImageResource(R.drawable.folder_transparent2);
+            moreOptions.setVisibility(View.INVISIBLE);
         } else {
             image.setImageResource(R.drawable.file_transparent);
         }

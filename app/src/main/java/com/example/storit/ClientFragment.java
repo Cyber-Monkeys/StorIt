@@ -194,9 +194,6 @@ public class ClientFragment extends Fragment {
 
     public void refreshAdapter() {
         clientAdapter.notifyDataSetChanged();
-//        clientAdapter = new ClientAdapter(getView().getContext(), fileList.toArray(new File[fileList.size()]),image.toArray(new Integer[image.size()]));
-//        gridView.setAdapter(clientAdapter);
-
     }
 
     public void addFolder(Folder newFolder) {

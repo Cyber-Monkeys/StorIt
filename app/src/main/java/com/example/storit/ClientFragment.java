@@ -1,5 +1,6 @@
 package com.example.storit;
 
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,10 +45,11 @@ public class ClientFragment extends Fragment {
     //variables
     private static final String TAG = "AndroidClarified ----";
     EditText editText2; // for searching files or folders
-    LinearLayout goBackLinearLayout;
+    LinearLayout goBackLinearLayout, moveHereLinearLayout, cancelLinearLayout;
+    ImageView moreOptions;
     private static String documentPath, rootPath;
     static String fullDirectory=""; //static - no need to instatiate this class obj
-    String userReference;
+    String userReference, moveFileDocumentPath;
     GridView gridView;
     TextView sortName;
     FirebaseFirestore db;
@@ -57,8 +60,10 @@ public class ClientFragment extends Fragment {
 //    ArrayList<File> tempFileName;
 
 
-
+    Node fileToMove;
+    ArrayList<Node> fileToMoveNodeList, tempNodeList;
     private ArrayList<Node> nodeList = new ArrayList<Node>();
+    File extra = new File(1, "Testing", 232, "TExt",  "dsadsada");
     private ClientAdapter clientAdapter;
 
     @Nullable
@@ -71,6 +76,8 @@ public class ClientFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        cancelLinearLayout = getView().findViewById(R.id.cancelMove);
+        moveHereLinearLayout = getView().findViewById(R.id.moveHere);
         goBackLinearLayout = getView().findViewById(R.id.goBack);
         db = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -84,6 +91,7 @@ public class ClientFragment extends Fragment {
         editText2 = getView().findViewById(R.id.editText2);
         sortName = getView().findViewById(R.id.sortName);
         gridView = getView().findViewById(R.id.gridView);
+
         //listener for searching files/folders
         editText2.addTextChangedListener(new TextWatcher() {
             @Override
@@ -98,8 +106,7 @@ public class ClientFragment extends Fragment {
                 } else {
                     searchFileFolder(s.toString());
                 }
-                refreshDirectory();
-
+                //refreshDirectory();
             }
 
             @Override
@@ -145,6 +152,36 @@ public class ClientFragment extends Fragment {
                 loadCurrentDirectory();
             }
         });
+
+        moveHereLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clientAdapter.moreOptions.setVisibility(View.VISIBLE);
+                moveHereLinearLayout.setVisibility(View.INVISIBLE);
+                cancelLinearLayout.setVisibility(View.INVISIBLE);
+
+                if(moveFileDocumentPath == getCurrentDocumentPath()){
+                    Toast.makeText(getContext(), "You can't move at same directory", Toast.LENGTH_SHORT).show();
+                } else{
+                    nodeList.add(fileToMove);
+                    addFolderDocumentPath(fileToMove.getNodeName());
+                    updateDirectory();
+                    fileToMoveNodeList.removeIf(node -> (fileToMove.getNodeName() == node.getNodeName()));
+                    moveFileUpdateDirectory(fileToMoveNodeList);
+                }
+
+            }
+        });
+
+        cancelLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clientAdapter.moreOptions.setVisibility(View.VISIBLE);
+                moveHereLinearLayout.setVisibility(View.INVISIBLE);
+                cancelLinearLayout.setVisibility(View.INVISIBLE);
+                updateDirectory();
+            }
+        });
     }
     public void addFile(File addedFile) {
         nodeList.add(addedFile);
@@ -157,9 +194,6 @@ public class ClientFragment extends Fragment {
 
     public void refreshAdapter() {
         clientAdapter.notifyDataSetChanged();
-//        clientAdapter = new ClientAdapter(getView().getContext(), fileList.toArray(new File[fileList.size()]),image.toArray(new Integer[image.size()]));
-//        gridView.setAdapter(clientAdapter);
-
     }
 
     public void addFolder(Folder newFolder) {
@@ -207,6 +241,21 @@ public class ClientFragment extends Fragment {
         });
     }
 
+    public void moveFileUpdateDirectory(ArrayList<Node> movedNodeList) { //updated the previous directory of the moved file
+        documentReference = db.document(moveFileDocumentPath);
+        documentReference.update("directory", movedNodeList).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Directory updated" );
+                refreshDirectory();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure" + e.getMessage());
+            }
+        });
+    }
 
     public void refreshDirectory() {
         //nodeList.clear();
@@ -241,12 +290,14 @@ public class ClientFragment extends Fragment {
                         } else {
                             String fileKey = user.get("fileKey").toString();
                             String type = user.get("fileType").toString();
-                            int fileId = (int) user.get("fileId");
-                            int fileSize = (int) user.get("fileSize");
-                            nodeList.add(new File(fileId, name, fileSize, type, fileKey));
+                            long fileId = (long) user.get("fileId");
+                            long fileSize = (long) user.get("fileSize");
+                            nodeList.add(new File((int)fileId, name, (int)fileSize, type, fileKey));
                         }
-                    }
 
+                    }
+                    //nodeList.add(extra); //PLEASEEEEEEEE DELETEEEEEEEEE LATERRRRRRRRRRRR
+                    tempNodeList = (ArrayList<Node>)nodeList.clone(); // create copy
                     refreshDirectory();
                 }  else{
                     Toast.makeText(getContext(), "not exists", Toast.LENGTH_SHORT).show();
@@ -291,8 +342,13 @@ public class ClientFragment extends Fragment {
         refreshDirectory();
     } // end of removeCurrentDirectory
     private void searchFileFolder(String fileFolderName){ //searching files or folders
+        nodeList.clone();
+        for(int i=0; i < tempNodeList.size(); i++){
+            nodeList.add(tempNodeList.get(i));
+        }
         nodeList.removeIf(f -> !f.getNodeName().toLowerCase().contains(fileFolderName.toLowerCase()));
-        refreshAdapter();
+        refreshDirectory();
+        //refreshAdapter();
     } //end of searchFileFolder
 
 
@@ -303,6 +359,16 @@ public class ClientFragment extends Fragment {
     }
     public ArrayList<Node> getNodeList(){
         return nodeList;
+    }
+
+    public void pressedMoveMoreOptions(Folder fileToMove){
+        String copyofDocumentPath = getCurrentDocumentPath();
+        moveFileDocumentPath = copyofDocumentPath;
+        fileToMoveNodeList = (ArrayList<Node>)nodeList.clone();
+        clientAdapter.moreOptions.setVisibility(View.INVISIBLE);
+        moveHereLinearLayout.setVisibility(View.VISIBLE);
+        cancelLinearLayout.setVisibility(View.VISIBLE);
+        this.fileToMove = fileToMove;
     }
 
 }

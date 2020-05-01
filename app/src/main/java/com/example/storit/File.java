@@ -24,8 +24,6 @@ public class File extends Node{
     }
 
 
-
-
     private File(Parcel in) {
         fileId = in.readInt();
         nodeName = in.readString();

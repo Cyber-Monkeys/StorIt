@@ -48,7 +48,7 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
     FirebaseAuth mFirebaseAuth;
     String userId;
     Node node;
-
+    File newFile;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,6 +60,7 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         node = getArguments().getParcelable("Node");
+        newFile = (File) node;
 
         db = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -100,8 +101,8 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
             public void onClick(View v) {
                 Toast.makeText(getContext(), "move Button", Toast.LENGTH_SHORT).show();
                 MoreOptionsBottomSheetDialog.this.dismiss(); //close dialog
-                Folder newFolder = new Folder(node.getNodeName());
-                ((Menu)getActivity()).clientFragment.pressedMoveMoreOptions(newFolder);
+
+                ((Menu)getActivity()).clientFragment.pressedMoveMoreOptions(newFile);
             }
         });
 
@@ -153,18 +154,19 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         //views to set in dialog
         final TextView nodeName = new TextView(getContext());
-        final TextView nodeType = new TextView(getContext());
+        final TextView fileSize = new TextView(getContext());
+        final TextView  fileType = new TextView(getContext());
         nodeName.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
-        nodeType.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+        fileSize.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+        fileType.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+
         nodeName.setText("Name: " + node.nodeName);
-        if(node.isFolder){
-            nodeType.setText("Type: Folder");
-        } else {
-            nodeType.setText("Type: File");
-        }
+        fileSize.setText("File Size: " + newFile.getFileSize());
+        fileType.setText("File Type: " + newFile.getFileType());
 
         linearLayout.addView(nodeName);
-        linearLayout.addView(nodeType);
+        linearLayout.addView(fileSize);
+        linearLayout.addView(fileType);
         linearLayout.setPadding(50,10,10,10);
 
         builder.setView(linearLayout);

@@ -67,6 +67,7 @@ public class ClientAdapter extends BaseAdapter {
             moreOptions.setVisibility(View.INVISIBLE);
         } else {
             image.setImageResource(R.drawable.file_transparent);
+            moreOptions.setVisibility(View.VISIBLE);
         }
         fileName.setText(nodeList.get(position).getNodeName());
 

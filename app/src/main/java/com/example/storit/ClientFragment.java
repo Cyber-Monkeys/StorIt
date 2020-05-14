@@ -342,10 +342,10 @@ public class ClientFragment extends Fragment {
         refreshDirectory();
     } // end of removeCurrentDirectory
     private void searchFileFolder(String fileFolderName){ //searching files or folders
-        nodeList.clone();
-        for(int i=0; i < tempNodeList.size(); i++){
-            nodeList.add(tempNodeList.get(i));
-        }
+//        nodeList.clone();
+//        for(int i=0; i < tempNodeList.size(); i++){
+//            nodeList.add(tempNodeList.get(i));
+//        }
         nodeList.removeIf(f -> !f.getNodeName().toLowerCase().contains(fileFolderName.toLowerCase()));
         refreshDirectory();
         //refreshAdapter();
@@ -361,7 +361,7 @@ public class ClientFragment extends Fragment {
         return nodeList;
     }
 
-    public void pressedMoveMoreOptions(Folder fileToMove){
+    public void pressedMoveMoreOptions(File fileToMove){
         String copyofDocumentPath = getCurrentDocumentPath();
         moveFileDocumentPath = copyofDocumentPath;
         fileToMoveNodeList = (ArrayList<Node>)nodeList.clone();

@@ -209,35 +209,6 @@
         android:background="#b0b0b0"/>
 
     <LinearLayout
-        android:id="@+id/backupButton"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:weightSum="100">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="15"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/icons8_copy_30" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/textBackup"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="85"
-            android:gravity="center_vertical"
-            android:text="Backup"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="#b0b0b0"/>

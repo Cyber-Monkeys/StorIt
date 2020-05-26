@@ -73,7 +73,7 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
         moveButton = getView().findViewById(R.id.moveButton);
         duplicateButton = getView().findViewById(R.id.duplicateButton);
         detailsButton = getView().findViewById(R.id.detailsButton);
-        backupButton = getView().findViewById(R.id.backupButton);
+//        backupButton = getView().findViewById(R.id.backupButton);
         removeButton = getView().findViewById(R.id.removeButton);
 
         //set icon and file/folder name
@@ -121,12 +121,12 @@ public class MoreOptionsBottomSheetDialog extends BottomSheetDialogFragment {
             }
         });
 
-        backupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "backup Button", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        backupButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getContext(), "backup Button", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override

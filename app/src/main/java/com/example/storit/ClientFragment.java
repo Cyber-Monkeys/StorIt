@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -369,6 +370,17 @@ public class ClientFragment extends Fragment {
         moveHereLinearLayout.setVisibility(View.VISIBLE);
         cancelLinearLayout.setVisibility(View.VISIBLE);
         this.fileToMove = fileToMove;
+    }
+
+    public void sortFile(){
+        Collections.sort(nodeList,
+                (o1, o2) -> o1.getNodeName().compareTo(o2.getNodeName()));
+        updateDirectory();
+    }
+
+    public void sortFileReverse(){
+        Collections.reverse(nodeList);
+        updateDirectory();
     }
 
 }

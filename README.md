@@ -1,25 +1,25 @@
 ## Table of Contents
 
-1. [Team](#team)
-2. [Storit](#Storit)
+1. [Storit](#Storit)
    1. [Overview](##Overview)
    2. [Usage](##Usage)
-3. [Development](#Development)
+2. [Development](#Development)
    1. [Storit-Client](##Storit-Client)
    2. [Storit-Firebase](##Storit-Firebase)
    3. [Storit-Server](##Storit-Server)
    4. [Storit-Tracker](##Storit-Tracker)
    5. [Libraries](##Libraries)
    6. [Goals&Accomplishments](##Goals&Accomplishments)
-4. [Team](#Team)
+3. [Team](#Team)
 
 # Storit
 
+<img src="./storit_logo.png" alt="storit logo -cloud" width="60k" height="60">
 Storit is a peer to peer distributed cloud storage mobile application.<br/>
 Available on Android and IOS.<br/>
-The application is not currently live.
+The application is not currently live.<br/> <br />
 
-<img src="./storit-poster.png" alt="Storit intro poster: store user data on other user's devices" width="350.081" height="600">
+<img src="./storit-poster3.png" alt="Storit intro poster: store user data on other user's devices" width="350.081" height="600">
 
 ## Overview
 
